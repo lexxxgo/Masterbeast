@@ -1,12 +1,12 @@
 [
   {
-    "Author": "Anmi",
-    "Name": "驯兽师助手",
-    "Description": "追踪驯兽师任务链和魔兽图鉴收集进度，支持捕获消息自动记录、任务与图鉴目标导航，并可配合 vnavmesh 和 Lifestream 完成同地图移动及跨地图传送。命令：/驯兽师 输出，可在自动输出与暂停状态之间切换。",
+    "Author": "Anmi (EN fork by lexxxgo)",
+    "Name": "Beastmaster Assistant (EN)",
+    "Description": "Tracks the Beastmaster quest chain and Beast Catalog collection progress, with automatic capture-message logging and navigation to quests and catalog targets. Can work with vnavmesh and Lifestream for same-map movement and cross-map teleporting. Command: /beastmaster output toggles Auto Rotation on/paused. This is an English translation fork of the original plugin by Anmi.",
     "InternalName": "Beastmaster",
-    "IconUrl": "https://raw.githubusercontent.com/anmili2022/Beastmaster/main/images/icon.png?v=2",
+    "IconUrl": "https://raw.githubusercontent.com/lexxxgo/Masterbeast/main/images/icon.png?v=2",
     "AssemblyVersion": "0.1.36.0",
-    "RepoUrl": "https://github.com/anmili2022/Beastmaster",
+    "RepoUrl": "https://github.com/lexxxgo/Masterbeast",
     "ApplicableVersion": "any",
     "DalamudApiLevel": 15,
     "Tags": [
@@ -16,9 +16,9 @@
     ],
     "IsHide": false,
     "IsTestingExclusive": false,
-    "DownloadLinkInstall": "https://github.com/anmili2022/Beastmaster/releases/download/0.1.36.0/Beastmaster.zip",
-    "DownloadLinkTesting": "https://github.com/anmili2022/Beastmaster/releases/download/0.1.36.0/Beastmaster.zip",
-    "DownloadLinkUpdate": "https://github.com/anmili2022/Beastmaster/releases/download/0.1.36.0/Beastmaster.zip",
+    "DownloadLinkInstall": "https://github.com/lexxxgo/Masterbeast/releases/download/0.1.36.0/Beastmaster.zip",
+    "DownloadLinkTesting": "https://github.com/lexxxgo/Masterbeast/releases/download/0.1.36.0/Beastmaster.zip",
+    "DownloadLinkUpdate": "https://github.com/lexxxgo/Masterbeast/releases/download/0.1.36.0/Beastmaster.zip",
     "LastUpdated": "2026-09-18T11:27:57Z"
   }
 ]

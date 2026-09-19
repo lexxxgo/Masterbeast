@@ -1,45 +1,47 @@
-# 驯兽师助手
+# Beastmaster Assistant
 
-用于追踪最终幻想 XIV 驯兽师任务链和魔兽图鉴收集进度的 Dalamud 插件。
+> **Note:** This is a fork of [anmili2022/Beastmaster](https://github.com/anmili2022/Beastmaster) maintained at [lexxxgo/Masterbeast](https://github.com/lexxxgo/Masterbeast) that only translates the original plugin's user interface and documentation from Chinese into English. All credit for the plugin's design and implementation goes to the original author, Anmi. This fork does not add or change any functionality.
 
-## 功能
+A Dalamud plugin for Final Fantasy XIV that tracks the Beastmaster quest chain and Beast Catalog collection progress.
 
-- 显示驯兽师任务链及客户端任务状态。
-- 收到“成功结识了……种的魔兽！”消息时，自动记录当前角色的图鉴进度。
-- 支持手动修改、隐藏已捕获魔兽，并按地图排列图鉴目标。
-- 支持任务接取点和野外图鉴目标导航。
-- 可配合 vnavmesh 和 Lifestream 完成同地图移动及跨地图传送。
-- 魔兽图鉴显示属性、大招和释放技能信息。
-- 自动输出悬浮窗显示当前魔兽和驯兽师量谱状态。
-- 高级技能支持独立开关和只读可用性判断。
+## Features
 
-## 安装
+- Displays the Beastmaster quest chain and its status based on client-side quest data.
+- Automatically records catalog progress on the current character when you receive a "You have successfully befriended a ... beast!" message.
+- Supports manually editing or hiding captured beasts, and sorting catalog targets by map.
+- Supports navigation to quest pickup points and field catalog targets.
+- Can work with vnavmesh and Lifestream to handle same-map movement and cross-map teleporting.
+- The Beast Catalog shows each beast's attribute, ultimate, and Release skill info.
+- The Auto Rotation overlay shows the current beast and Beastmaster gauge status.
+- Advanced skills support independent toggles and read-only availability checks.
 
-在 Dalamud 设置的自定义插件仓库中添加：
+## Installation
+
+Add the following to your custom plugin repositories in the Dalamud settings:
 
 ```text
-https://raw.githubusercontent.com/anmili2022/Beastmaster/main/repo.json
+https://raw.githubusercontent.com/lexxxgo/Masterbeast/main/repo.json
 ```
 
-## 指令
+## Commands
 
-- `/beastmaster`：打开驯兽师助手。
-- `/驯兽师`：打开驯兽师助手。
-- `/驯兽师 输出`：切换自动输出和暂停状态；关闭时开启，暂停时恢复，运行时暂停。
-- `/驯兽师 暂停`：暂停自动输出但保留开关状态。
-- `/驯兽师 恢复`：恢复已暂停的自动输出。
-- `/驯兽师 关闭`：关闭自动输出。
+- `/beastmaster`: Opens the Beastmaster Assistant.
+- `/驯兽师`: Opens the Beastmaster Assistant (Chinese alias).
+- `/驯兽师 输出`: Toggles Auto Rotation between on and paused; turns it on when off, resumes when paused, pauses when running.
+- `/驯兽师 暂停`: Pauses Auto Rotation while keeping the toggle on.
+- `/驯兽师 恢复`: Resumes a paused Auto Rotation.
+- `/驯兽师 关闭`: Turns off Auto Rotation.
 
-以上自动输出子命令也支持英文命令 `/beastmaster output|pause|resume|off`。
+The Auto Rotation subcommands above also support the English form: `/beastmaster output|pause|resume|off`.
 
-## 构建
+## Building
 
 ```powershell
 dotnet build
 ```
 
-构建结果位于 `output\Beastmaster.dll`。
+The build output is located at `output\Beastmaster.dll`.
 
-量谱资料见 [docs/BST_GAUGE.md](docs/BST_GAUGE.md)，ACR 设计见 [docs/BST_ACR_DESIGN.md](docs/BST_ACR_DESIGN.md)，斗兽塔第一盘资料见 [docs/BEAST_ARENA_ROUND_1.md](docs/BEAST_ARENA_ROUND_1.md)，开发路线见 [docs/ROADMAP.md](docs/ROADMAP.md)。
+Gauge reference: [docs/BST_GAUGE.md](https://github.com/lexxxgo/Masterbeast/blob/main/docs/BST_GAUGE.md); ACR design: [docs/BST_ACR_DESIGN.md](https://github.com/lexxxgo/Masterbeast/blob/main/docs/BST_ACR_DESIGN.md); Beast Arena Round 1 reference: [docs/BEAST_ARENA_ROUND_1.md](https://github.com/lexxxgo/Masterbeast/blob/main/docs/BEAST_ARENA_ROUND_1.md); development roadmap: [docs/ROADMAP.md](https://github.com/lexxxgo/Masterbeast/blob/main/docs/ROADMAP.md).
 
-发布流程见 [docs/release.md](docs/release.md)。
+Release process: [docs/release.md](docs/release.md).
