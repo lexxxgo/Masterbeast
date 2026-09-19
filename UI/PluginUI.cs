@@ -10,42 +10,42 @@ public sealed class PluginUI
 {
     private static readonly (string Key, string Label)[] MainSections =
     [
-        ("quests", "驯兽师任务链"),
-        ("catalog", "魔兽图鉴"),
-        ("party", "斗兽奇弈"),
-        ("equipment", "推荐装备"),
-        ("combinations", "推荐组合"),
-        ("sequences", "技能序列"),
-        ("rules", "规则模式"),
-        ("commands", "快捷指令"),
-        ("auto-output", "自动输出"),
-        ("settings", "设置"),
+        ("quests", "Beastmaster Quest Chain"),
+        ("catalog", "Beast Catalog"),
+        ("party", "Beast Arena Trials"),
+        ("equipment", "Recommended Gear"),
+        ("combinations", "Recommended Team Comps"),
+        ("sequences", "Skill Sequence"),
+        ("rules", "Rule Mode"),
+        ("commands", "Quick Commands"),
+        ("auto-output", "Auto Rotation"),
+        ("settings", "Settings"),
         ("debug", "DEBUG"),
-        ("arena-navigation", "前往斗兽塔"),
+        ("arena-navigation", "Go to the Beast Arena"),
     ];
 
     private static readonly (uint ActionId, string Name)[] SequenceActions =
     [
-        (44879, "碎击斩"),
-        (44883, "碎咬斧"),
-        (44885, "裂盾劈"),
-        (44893, "盾牌冲击"),
-        (44890, "释放"),
-        (44891, "最后一击"),
-        (44881, "一号兽笛"),
-        (44892, "二号兽笛"),
-        (44894, "三号兽笛"),
-        (44895, "借用"),
-        (44896, "百兽肤"),
-        (44897, "百虫肤"),
-        (44898, "有翼飞掠"),
-        (44899, "草木播种"),
-        (44900, "水栖波"),
-        (44901, "甲鳞肤"),
-        (44902, "咒具碎魂"),
-        (44903, "死尸净化"),
-        (44904, "声援"),
-        (44905, "鼓劲"),
+        (44879, "Shattering Slash"),
+        (44883, "Shattering Bite Axe"),
+        (44885, "Shieldbreaker Cleave"),
+        (44893, "Shield Bash"),
+        (44890, "Release"),
+        (44891, "Finishing Blow"),
+        (44881, "Beast Whistle 1"),
+        (44892, "Beast Whistle 2"),
+        (44894, "Beast Whistle 3"),
+        (44895, "Borrow"),
+        (44896, "Beastskin"),
+        (44897, "Bugskin"),
+        (44898, "Winged Swoop"),
+        (44899, "Sow Seed"),
+        (44900, "Aquatic Wave"),
+        (44901, "Scaleskin"),
+        (44902, "Soulshatter Charm"),
+        (44903, "Purify Corpse"),
+        (44904, "Cheer"),
+        (44905, "Rally"),
     ];
 
     private readonly BeastmasterConfiguration configuration;
@@ -60,16 +60,16 @@ public sealed class PluginUI
     private readonly BeastmasterSequenceService sequenceService;
     private readonly BeastmasterRuleService ruleService;
     private readonly BeastmasterPetPartyService petPartyService;
-    private string debugQuery = "驯兽";
+    private string debugQuery = "Tame";
     private string debugActionId = "44890";
-    private string debugResult = "点击按钮读取客户端资料。";
+    private string debugResult = "Click the button to load client data.";
     private bool debugUseAdjustedActionId = true;
     private int debugSearchType;
     private int debugProjectDataType;
     private int debugCurrentStateType;
     private DateTime nextQuestStatusRefreshUtc = DateTime.MinValue;
     private DateTime nextGaugeRefreshUtc = DateTime.MinValue;
-    private BeastmasterGaugeSnapshot gaugeSnapshot = BeastmasterGaugeSnapshot.Unavailable("等待读取");
+    private BeastmasterGaugeSnapshot gaugeSnapshot = BeastmasterGaugeSnapshot.Unavailable("Waiting to load");
     private int autoOutputCollapseState;
     private int selectedEquipmentSet;
     private int selectedBattleLogIndex;
@@ -128,7 +128,7 @@ public sealed class PluginUI
 
         ImGui.SetNextWindowSize(new Vector2(900f, 600f), ImGuiCond.FirstUseEver);
         ImGui.SetNextWindowSizeConstraints(new Vector2(700f, 460f), new Vector2(float.MaxValue, float.MaxValue));
-        if (!ImGui.Begin($"驯兽师助手 v{GetType().Assembly.GetName().Version}", ref isMainWindowOpen))
+        if (!ImGui.Begin($"Beastmaster Assistant v{GetType().Assembly.GetName().Version}", ref isMainWindowOpen))
         {
             ImGui.End();
             return;
@@ -183,10 +183,10 @@ public sealed class PluginUI
         ImGui.TextColored(new Vector4(0.35f, 0.85f, 0.55f, 1f), autoCaptureService.StatusText);
         if (configuration.ShowGaugeInOverlay)
         {
-            ImGui.Text($"下一个技能：{autoCaptureService.NextActionName}");
+            ImGui.Text($"Next skill: {autoCaptureService.NextActionName}");
             if (!string.IsNullOrWhiteSpace(autoCaptureService.NextActionReason))
             {
-                ImGui.TextDisabled($"原因：{autoCaptureService.NextActionReason}");
+                ImGui.TextDisabled($"Reason: {autoCaptureService.NextActionReason}");
             }
         }
         if (configuration.ShowGaugeInOverlay)
@@ -203,7 +203,7 @@ public sealed class PluginUI
         }
         ImGui.Separator();
         var tryCapture = autoCaptureService.TryCapture;
-        if (ImGui.Checkbox("捕获阈值", ref tryCapture))
+        if (ImGui.Checkbox("Capture Threshold", ref tryCapture))
         {
             autoCaptureService.SetTryCapture(tryCapture);
         }
@@ -212,7 +212,7 @@ public sealed class PluginUI
         if (configuration.ShowGaugeInOverlay)
         {
             var basicComboEnabled = autoCaptureService.BasicComboEnabled;
-            if (ImGui.Checkbox("基础技能（1→2→3）", ref basicComboEnabled))
+            if (ImGui.Checkbox("Basic Combo (1→2→3)", ref basicComboEnabled))
             {
                 autoCaptureService.SetBasicComboEnabled(basicComboEnabled);
             }
@@ -228,10 +228,10 @@ public sealed class PluginUI
             }
             ImGui.SameLine();
             DrawSequenceSelector(string.Empty, "##overlay-sequence-selector");
-            ImGui.TextDisabled($"状态：{sequenceService.Status}");
-            if (sequenceService.IsControlling && ImGui.Button("中止技能序列"))
+            ImGui.TextDisabled($"Status: {sequenceService.Status}");
+            if (sequenceService.IsControlling && ImGui.Button("Abort Skill Sequence"))
             {
-                sequenceService.Abort("已手动中止，等待下一次团队倒计时");
+                sequenceService.Abort("Manually aborted, waiting for the next party countdown");
             }
         }
 
@@ -276,8 +276,8 @@ public sealed class PluginUI
             return;
         }
 
-        ImGui.Text("奇盘编队");
-        ImGui.TextDisabled($"当前编队 · {snapshot.MemberCount}/{snapshot.Capacity}");
+        ImGui.Text("Trial Formation");
+        ImGui.TextDisabled($"Current Formation · {snapshot.MemberCount}/{snapshot.Capacity}");
         var presetNames = string.Join('\0', presets.Select(preset => preset.Name)) + '\0';
         ImGui.SetNextItemWidth(180f);
         if (ImGui.Combo("##party-overlay-preset", ref selectedIndex, presetNames))
@@ -289,7 +289,7 @@ public sealed class PluginUI
         ImGui.SameLine();
         ImGui.BeginDisabled(petPartyService.IsApplying || !CanApplyPartyPreset(selected));
         PushPartyApplyButtonStyle();
-        if (ImGui.Button(petPartyService.IsApplying ? "应用中..." : "应用"))
+        if (ImGui.Button(petPartyService.IsApplying ? "Applying..." : "Apply"))
         {
             petPartyService.TryApply(selected);
         }
@@ -314,16 +314,16 @@ public sealed class PluginUI
     {
         ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1f, 0.85f, 0.35f, 1f));
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("驯兽ACR");
+        ImGui.TextUnformatted("Beastmaster ACR");
         ImGui.PopStyleColor();
 
         if (ImGui.IsItemHovered())
         {
             ImGui.SetTooltip(autoOutputCollapseState switch
             {
-                0 => "左键半折叠：隐藏高级技能按钮和技能序列",
-                1 => "左键完全折叠悬浮窗",
-                _ => "左键展开悬浮窗",
+                0 => "Left-click to half-collapse: hides advanced skill buttons and the skill sequence",
+                1 => "Left-click to fully collapse the overlay",
+                _ => "Left-click to expand the overlay",
             });
         }
 
@@ -334,8 +334,8 @@ public sealed class PluginUI
 
         ImGui.SameLine();
         var headerStatus = !autoCaptureService.IsEnabled
-            ? "关闭"
-            : autoCaptureService.IsPaused ? "暂停" : "自动";
+            ? "Off"
+            : autoCaptureService.IsPaused ? "Pause" : "Auto";
         if (DrawOverlayStatusBadge(
             headerStatus,
             autoCaptureService.IsEnabled && !autoCaptureService.IsPaused
@@ -354,15 +354,15 @@ public sealed class PluginUI
         if (ImGui.IsItemHovered())
         {
             ImGui.SetTooltip(!autoCaptureService.IsEnabled
-                ? "请先在自动输出栏目开启自动输出"
-                : autoCaptureService.IsPaused ? "点击恢复自动输出" : "点击暂停自动输出");
+                ? "Please enable Auto Rotation in the Auto Rotation tab first"
+                : autoCaptureService.IsPaused ? "Click to resume Auto Rotation" : "Click to pause Auto Rotation");
         }
 
         ImGui.SameLine();
         var tryCapture = autoCaptureService.TryCapture;
         var forceCapture = autoCaptureService.ForceCapture;
         if (DrawOverlayStatusBadge(
-            "捕获",
+            "Capture",
             forceCapture
                 ? new Vector4(0.48f, 0.12f, 0.12f, 1f)
                 : tryCapture
@@ -391,16 +391,16 @@ public sealed class PluginUI
         if (ImGui.IsItemHovered())
         {
             ImGui.SetTooltip(forceCapture
-                ? "强制捕获：无视目标捕获BUFF，但仍受血量阈值限制；点击关闭捕获"
+                ? "Force Capture: ignores the target's capture buff but still respects the HP threshold; click to turn capture off"
                 : tryCapture
-                    ? "尝试捕获：按血量和捕获BUFF判断；点击切换为强制捕获"
-                    : "捕获未开启；点击开启尝试捕获");
+                    ? "Try Capture: judged by HP and the capture buff; click to switch to Force Capture"
+                    : "Capture is off; click to enable Try Capture");
         }
 
         ImGui.SameLine();
         var activeAttack = autoCaptureService.ActiveAttack;
         if (DrawOverlayStatusBadge(
-            "主动",
+            "Active",
             activeAttack
                 ? new Vector4(0.2f, 0.42f, 0.28f, 1f)
                 : new Vector4(0.3f, 0.3f, 0.34f, 1f),
@@ -414,8 +414,8 @@ public sealed class PluginUI
         if (ImGui.IsItemHovered())
         {
             ImGui.SetTooltip(activeAttack
-                ? "未进战时允许普通 ACR 主动攻击、捕获和使用斗兽塔技能"
-                : "未进战时普通 ACR 不会攻击、捕获或使用斗兽塔技能");
+                ? "Allows normal ACR to actively attack, capture, and use Beast Arena skills while not in combat"
+                : "Normal ACR will not attack, capture, or use Beast Arena skills while not in combat");
         }
     }
 
@@ -444,8 +444,8 @@ public sealed class PluginUI
             return;
         }
 
-        ImGui.TableSetupColumn("导航", ImGuiTableColumnFlags.WidthFixed, 190f);
-        ImGui.TableSetupColumn("内容", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Navigate", ImGuiTableColumnFlags.WidthFixed, 190f);
+        ImGui.TableSetupColumn("Content", ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableNextRow();
         ImGui.TableNextColumn();
         DrawSidebar();
@@ -474,21 +474,21 @@ public sealed class PluginUI
 
         var entry = gaugeSnapshot.SummonEntry;
         ImGui.Text(entry == null
-            ? $"当前魔兽：{(gaugeSnapshot.SummonDataId == 0 ? "未召唤" : gaugeSnapshot.SummonName)}"
-            : $"当前魔兽：{entry.Name} [{entry.Attribute}]");
-        DrawOverlayGaugeBar("技力", gaugeSnapshot.Tp, BeastmasterGaugeSnapshot.MaximumGauge, new Vector4(0.95f, 0.75f, 0.2f, 1f));
-        DrawOverlayGaugeBar("兽力", gaugeSnapshot.BeastPower, BeastmasterGaugeSnapshot.MaximumGauge, new Vector4(0.35f, 0.7f, 1f, 1f));
-        ImGui.Text($"御兽之心：{gaugeSnapshot.BeastHeartStacks} 层 | 兽灵之心：{gaugeSnapshot.BeastSoulStacks} 层");
+            ? $"Current Beast: {(gaugeSnapshot.SummonDataId == 0 ? "Not Summoned" : gaugeSnapshot.SummonName)}"
+            : $"Current Beast: {entry.Name} [{entry.Attribute}]");
+        DrawOverlayGaugeBar("Skill Power", gaugeSnapshot.Tp, BeastmasterGaugeSnapshot.MaximumGauge, new Vector4(0.95f, 0.75f, 0.2f, 1f));
+        DrawOverlayGaugeBar("Beast Power", gaugeSnapshot.BeastPower, BeastmasterGaugeSnapshot.MaximumGauge, new Vector4(0.35f, 0.7f, 1f, 1f));
+        ImGui.Text($"Heart of Taming: {gaugeSnapshot.BeastHeartStacks} stacks | Heart of the Beast Spirit: {gaugeSnapshot.BeastSoulStacks} stacks");
     }
 
     private void DrawOverlayTargetStatus()
     {
-        ImGui.Text("当前目标");
+        ImGui.Text("Current Target");
         var target = DalamudApi.TargetManager.Target;
         if (target is not Dalamud.Game.ClientState.Objects.Types.IBattleChara)
         {
             ImGui.SameLine();
-            ImGui.TextDisabled("无有效目标");
+            ImGui.TextDisabled("No valid target");
             return;
         }
 
@@ -498,7 +498,7 @@ public sealed class PluginUI
         ImGui.TextDisabled($"{autoCaptureService.TargetHpPercent:0.#}% · {autoCaptureService.TargetStatus}");
         if (configuration.ShowGaugeInOverlay)
         {
-            ImGui.TextDisabled($"捕获：{autoCaptureService.CaptureState}");
+            ImGui.TextDisabled($"Capture: {autoCaptureService.CaptureState}");
         }
     }
 
@@ -523,13 +523,13 @@ public sealed class PluginUI
 
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip("捕获血量阈值：目标血量小于或等于此百分比时释放捕获");
+            ImGui.SetTooltip("Capture HP Threshold: uses Capture when the target's HP is at or below this percentage");
         }
     }
 
     private void DrawOverlayAdvancedCandidates()
     {
-        if (!ImGui.CollapsingHeader("高级技能候选##BeastmasterAdvancedCandidates"))
+        if (!ImGui.CollapsingHeader("Advanced Skill Candidates##BeastmasterAdvancedCandidates"))
         {
             return;
         }
@@ -537,28 +537,28 @@ public sealed class PluginUI
         var entry = gaugeSnapshot.SummonEntry;
         if (entry == null)
         {
-            ImGui.TextDisabled("未识别当前魔兽，无法生成高级技能候选。");
+            ImGui.TextDisabled("Current beast not recognized; cannot generate advanced skill candidates.");
             return;
         }
 
-        ImGui.TextColored(GetAttributeColor(entry.Attribute), $"属性：{entry.Attribute}");
+        ImGui.TextColored(GetAttributeColor(entry.Attribute), $"Attribute: {entry.Attribute}");
         DrawAdvancedCandidate(
-            configuration.BeastHeartCooperationEnabled ? "御兽协作（黄豆）" : "兽灵协作（蓝豆）",
+            configuration.BeastHeartCooperationEnabled ? "Taming Link (Yellow Orb)" : "Beast Spirit Link (Blue Orb)",
             configuration.BeastHeartCooperationEnabled
-                ? $"{GetActionName(47093)} → 属性斧"
-                : $"属性斧 → {GetActionName(47093)}",
+                ? $"{GetActionName(47093)} → Attribute Axe"
+                : $"Attribute Axe → {GetActionName(47093)}",
             configuration.BeastHeartCooperationEnabled || configuration.BeastSoulCooperationEnabled,
             gaugeSnapshot.Tp >= 100 && gaugeSnapshot.BeastPower >= 100
-                ? "技力和兽力满足基础门槛"
-                : $"资源不足：技力 {gaugeSnapshot.Tp}/100，兽力 {gaugeSnapshot.BeastPower}/100");
+                ? "Skill Power and Beast Power meet the basic threshold"
+                : $"Insufficient resources: Skill Power {gaugeSnapshot.Tp}/100, Beast Power {gaugeSnapshot.BeastPower}/100");
         var thirdFormEnabled = configuration.PhysicalThirdFormEnabled || configuration.MagicalThirdFormEnabled;
         DrawAdvancedCandidate(
-            configuration.PhysicalThirdFormEnabled ? "万象流转（物理）" : "万象流转（魔法）",
+            configuration.PhysicalThirdFormEnabled ? "Convergence (Physical)" : "Convergence (Magic)",
             GetThirdFormActionName(gaugeSnapshot),
             thirdFormEnabled,
             GetThirdFormReason(gaugeSnapshot));
-        ImGui.TextDisabled($"释放：运行时调整技能（{(configuration.AutoReleaseEnabled ? "开启" : "关闭")}）");
-        if (ImGui.Button($"手动释放大招##manual-ultimate-overlay"))
+        ImGui.TextDisabled($"Release: adjusted at runtime ({(configuration.AutoReleaseEnabled ? "On" : "Off")})");
+        if (ImGui.Button($"Manually Use Ultimate##manual-ultimate-overlay"))
         {
             autoCaptureService.TryUseUltimate();
         }
@@ -570,16 +570,16 @@ public sealed class PluginUI
     {
         ImGui.Text($"{type}：{actionName}");
         ImGui.SameLine();
-        ImGui.TextDisabled(enabled ? reason : "开关已关闭");
+        ImGui.TextDisabled(enabled ? reason : "Toggle is off");
     }
 
     private void DrawSidebar()
     {
-        ImGui.Text("驯兽师助手");
+        ImGui.Text("Beastmaster Assistant");
         ImGui.TextDisabled("Beastmaster Progress Hub");
         ImGui.Separator();
 
-        DrawSidebarLabel("内容");
+        DrawSidebarLabel("Content");
         DrawSidebarButton(MainSections[0]);
         DrawSidebarButton(MainSections[1]);
         DrawSidebarButton(MainSections[2]);
@@ -591,10 +591,10 @@ public sealed class PluginUI
         DrawSidebarButton(MainSections[8]);
 
         ImGui.Separator();
-        DrawSidebarLabel("工具");
+        DrawSidebarLabel("Tools");
         DrawSidebarButton(MainSections[9]);
 
-        if (ImGui.Button("反馈与建议", new Vector2(ImGui.GetContentRegionAvail().X, 30f)))
+        if (ImGui.Button("Feedback & Suggestions", new Vector2(ImGui.GetContentRegionAvail().X, 30f)))
         {
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
                 "https://discord.com/channels/1258981591124938762/1546882305686118420")
@@ -642,8 +642,8 @@ public sealed class PluginUI
                     148,
                     4,
                     new Vector3(24.238f, -6.003f, 65.809f),
-                    "黑衣森林中央林区",
-                    "斗兽塔"));
+                    "Central Shroud",
+                    "Beast Arena"));
             }
         }
 
@@ -665,15 +665,15 @@ public sealed class PluginUI
 
     private void DrawArenaNavigation()
     {
-        ImGui.Text("前往斗兽塔");
-        ImGui.TextDisabled("自动导航至黑衣森林中央林区的斗兽塔入口位置。");
+        ImGui.Text("Go to the Beast Arena");
+        ImGui.TextDisabled("Automatically navigates to the Beast Arena entrance in Central Shroud.");
         ImGui.Separator();
-        ImGui.Text("类型：当前位置");
+        ImGui.Text("Type: Current Location");
         ImGui.TextDisabled("TerritoryType: 148");
-        ImGui.TextDisabled("区域：黑衣森林中央林区");
+        ImGui.TextDisabled("Zone: Central Shroud");
         ImGui.TextDisabled("Map.RowId: 4");
-        ImGui.TextDisabled("世界坐标：X=24.238, Y=-6.003, Z=65.809");
-        ImGui.TextDisabled("需要 vnavmesh；跨区需要 Lifestream");
+        ImGui.TextDisabled("World Coordinates: X=24.238, Y=-6.003, Z=65.809");
+        ImGui.TextDisabled("Requires vnavmesh; cross-zone travel requires Lifestream");
     }
 
     private void DrawContent()
@@ -725,46 +725,46 @@ public sealed class PluginUI
 
     private static void DrawRecommendedCombinations()
     {
-        ImGui.TextColored(new Vector4(1f, 0.35f, 0.25f, 1f), "先做主线，拿到补正装备以后刷级会轻松很多！！！");
-        ImGui.Text("推荐组合"); ImGui.SameLine();
-        ImGui.TextDisabled("静态攻略，不接入自动输出");
+        ImGui.TextColored(new Vector4(1f, 0.35f, 0.25f, 1f), "Do the main quest line first — leveling gets much easier once you have the catch-up gear!!!");
+        ImGui.Text("Recommended Team Comps"); ImGui.SameLine();
+        ImGui.TextDisabled("Static guide only, not wired into Auto Rotation");
         ImGui.Separator();
 
-        ImGui.Text("虫队 · 1、2层速刷");
-        ImGui.TextColored(new Vector4(0.95f, 0.82f, 0.25f, 1f), "推荐阵容：螳螂 + 胡蜂 + 库西");
-        ImGui.TextWrapped("最简单、最无脑的速刷阵容。核心难点是保证螳螂的增益技能不要落空。");
-        DrawCombinationStep("1 笛召唤螳螂，施加物理易伤", true, "，再使用");
-        DrawCombinationStep("2 笛召唤胡蜂，使用", false, "进行自爆。");
-        DrawCombinationStep("3 笛召唤库西，使用", false, "，正常输出。");
+        ImGui.Text("Bug Team · Floors 1-2 Speed Clear");
+        ImGui.TextColored(new Vector4(0.95f, 0.82f, 0.25f, 1f), "Recommended lineup: Mantis + Hornet + Kusi");
+        ImGui.TextWrapped("The simplest, most brainless speed-clear lineup. The key is making sure the mantis's buff skill doesn't whiff.");
+        DrawCombinationStep("Whistle 1 summons the Mantis, applying physical vulnerability", true, ", then use");
+        DrawCombinationStep("Whistle 2 summons the Hornet, use", false, "to self-destruct.");
+        DrawCombinationStep("Whistle 3 summons Kusi, use", false, ", then attack normally.");
 
         ImGui.Separator();
-        ImGui.Text("虫队 · 高1层速刷");
-        ImGui.TextColored(new Vector4(0.95f, 0.82f, 0.25f, 1f), "推荐阵容：螳螂 + 蜂鸟 + 胡蜂");
-        DrawCombinationStep("1 笛召唤螳螂，施加物理易伤", true, "，再使用");
-        DrawCombinationStep("2 笛召唤蜂鸟，使用", true, "「六连踹」（单体），再使用");
-        DrawCombinationStep("3 笛召唤胡蜂，等到 BOSS 血量低于 25% 时使用", false, "。");
+        ImGui.Text("Bug Team · High Floor 1 Speed Clear");
+        ImGui.TextColored(new Vector4(0.95f, 0.82f, 0.25f, 1f), "Recommended lineup: Mantis + Hummingbird + Hornet");
+        DrawCombinationStep("Whistle 1 summons the Mantis, applying physical vulnerability", true, ", then use");
+        DrawCombinationStep("Whistle 2 summons the Hummingbird, use", true, ""Six-Hit Kick" (single target), then use");
+        DrawCombinationStep("Whistle 3 summons the Hornet; once the boss's HP drops below 25%, use", false, "。");
 
         ImGui.Separator();
-        ImGui.Text("水队 · 参考阵容");
-        ImGui.TextColored(new Vector4(0.35f, 0.75f, 1f, 1f), "蝾螈 + 巨型陆蟹 + 壳蟹");
-        ImGui.TextWrapped("核心思路是由蝾螈和巨型陆蟹分别提供魔法易伤与水属性易伤，三号位壳蟹负责主要输出。");
-        ImGui.TextDisabled("开战前先切 3 笛准备壳蟹的借用；水栖波尽量打在易伤 Buff 内，也可驱散敌方增益。");
-        DrawCombinationStep("1 笛召唤蝾螈，施加魔法易伤", true, "，再使用");
-        DrawCombinationStep("2 笛召唤巨型陆蟹，施加水属性易伤", true, "，打一套连携后使用");
-        DrawCombinationStep("3 笛召唤壳蟹", false, "，正常输出。");
+        ImGui.Text("Water Team · Reference Lineup");
+        ImGui.TextColored(new Vector4(0.35f, 0.75f, 1f, 1f), "Newt + Giant Land Crab + Shellcrab");
+        ImGui.TextWrapped("The core idea is that the Newt and Giant Land Crab each apply magic and water vulnerability, while the third slot, Shellcrab, handles the main damage.");
+        ImGui.TextDisabled("Before the fight, switch to Whistle 3 to prep the Shellcrab's Borrow; try to land Aquatic Wave inside the vulnerability window, which can also dispel enemy buffs.");
+        DrawCombinationStep("Whistle 1 summons the Newt, applying magic vulnerability", true, ", then use");
+        DrawCombinationStep("Whistle 2 summons the Giant Land Crab, applying water vulnerability", true, ", perform a combo, then use");
+        DrawCombinationStep("Whistle 3 summons the Shellcrab", false, ", then attack normally.");
 
-        ImGui.Text("水队 · 1、2层速刷变体");
-        ImGui.TextColored(new Vector4(0.35f, 0.75f, 1f, 1f), "蝾螈 + 巨型陆蟹 + 碧企鹅");
-        ImGui.TextDisabled("开战前先切 3 笛准备碧企鹅的借用；陆蟹无需等待完整连携。");
-        DrawCombinationStep("1 笛召唤蝾螈，施加魔法易伤", true, "，再使用");
-        DrawCombinationStep("2 笛召唤巨型陆蟹，施加水属性易伤", true, "，无需等待完整连携，直接使用");
-        DrawCombinationStep("3 笛召唤碧企鹅", false, "，正常输出。");
+        ImGui.Text("Water Team · Floors 1-2 Speed Clear Variant");
+        ImGui.TextColored(new Vector4(0.35f, 0.75f, 1f, 1f), "Newt + Giant Land Crab + Jade Penguin");
+        ImGui.TextDisabled("Before the fight, switch to Whistle 3 to prep the Jade Penguin's Borrow; the Land Crab doesn't need to wait for the full combo.");
+        DrawCombinationStep("Whistle 1 summons the Newt, applying magic vulnerability", true, ", then use");
+        DrawCombinationStep("Whistle 2 summons the Giant Land Crab, applying water vulnerability", true, ", no need to wait for the full combo, use directly");
+        DrawCombinationStep("Whistle 3 summons the Jade Penguin", false, ", then attack normally.");
 
         ImGui.Separator();
-        ImGui.Text("投稿与来源");
-        ImGui.Text("投稿来源：网友 大三元");
-        ImGui.Text("水队参考视频：夜风");
-        if (ImGui.Button("打开 Bilibili 参考视频##recommended-combination-bilibili"))
+        ImGui.Text("Credits & Sources");
+        ImGui.Text("Submitted by: community member Dasanyuan");
+        ImGui.Text("Water Team reference video: Yefeng");
+        if (ImGui.Button("Open the Bilibili Reference Video##recommended-combination-bilibili"))
         {
             Process.Start(new ProcessStartInfo(
                 "https://www.bilibili.com/video/BV1c1Y46AEnN/?spm_id_from=333.788.videopod.sections&vd_source=e8d743edd1edd93f4c56cdcf6833f6ff&p=2")
@@ -773,7 +773,7 @@ public sealed class PluginUI
             });
         }
         ImGui.SameLine();
-        ImGui.TextDisabled("点击后使用系统浏览器打开");
+        ImGui.TextDisabled("Opens in your default browser when clicked");
     }
 
     private static void DrawCombinationStep(string prefix, bool finalStrike, string suffix)
@@ -782,13 +782,13 @@ public sealed class PluginUI
         ImGui.SameLine();
         ImGui.TextUnformatted(prefix);
         ImGui.SameLine(0f, 3f);
-        DrawCombinationAction("[释放]", 44890, new Vector4(1f, 0.82f, 0.25f, 1f));
+        DrawCombinationAction("[Release]", 44890, new Vector4(1f, 0.82f, 0.25f, 1f));
         if (finalStrike)
         {
             ImGui.SameLine(0f, 3f);
             ImGui.TextUnformatted(suffix);
             ImGui.SameLine(0f, 3f);
-            DrawCombinationAction("[最后一击]", 44891, new Vector4(1f, 0.4f, 0.3f, 1f));
+            DrawCombinationAction("[Finishing Blow]", 44891, new Vector4(1f, 0.4f, 0.3f, 1f));
             ImGui.SameLine(0f, 3f);
             ImGui.TextUnformatted("。");
         }
@@ -808,11 +808,11 @@ public sealed class PluginUI
         }
 
         ImGui.BeginTooltip();
-        DrawActionTooltip("技能", actionId);
+        DrawActionTooltip("Skill", actionId);
         var description = actionId switch
         {
-            44890u => "令当前召唤兽对目标使用对应的释放技能；实际技能会根据当前召唤兽调整。",
-            44891u => "令当前召唤兽对目标使用最后一击。",
+            44890u => "Has the current summoned beast use its Release skill on the target; the actual skill changes based on the current beast.",
+            44891u => "Has the current summoned beast use Finishing Blow on the target.",
             _ => string.Empty,
         };
         if (!string.IsNullOrWhiteSpace(description))
@@ -827,8 +827,8 @@ public sealed class PluginUI
 
     private void DrawSequenceEditor()
     {
-        ImGui.Text("技能序列");
-        ImGui.TextDisabled("编辑倒计时和战斗步骤；序列不会自动执行，除非在自动输出中启用。");
+        ImGui.Text("Skill Sequence");
+        ImGui.TextDisabled("Edit the countdown and combat steps; the sequence won't run automatically unless enabled in Auto Rotation.");
         ImGui.Separator();
 
         var sequences = configuration.Sequences;
@@ -839,7 +839,7 @@ public sealed class PluginUI
 
         var selected = Math.Clamp(configuration.SelectedSequenceIndex, 0, sequences.Count - 1);
         var names = string.Join('\0', sequences.Select(sequence => sequence.Name)) + '\0';
-        if (ImGui.Combo("当前序列", ref selected, names))
+        if (ImGui.Combo("Current Sequence", ref selected, names))
         {
             configuration.SelectedSequenceIndex = selected;
             configuration.Save();
@@ -847,81 +847,81 @@ public sealed class PluginUI
 
         ImGui.SameLine();
         var sequenceChat = sequenceService.ChatMessagesEnabled;
-        if (ImGui.Checkbox("序列诊断", ref sequenceChat))
+        if (ImGui.Checkbox("Sequence Diagnostics", ref sequenceChat))
         {
             sequenceService.SetChatMessagesEnabled(sequenceChat);
         }
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip("输出序列启动、技能请求、完成和中止信息；失败重试不会刷屏。");
+            ImGui.SetTooltip("Logs sequence start, skill requests, completion, and abort events; failed retries won't spam the log.");
         }
 
         var sequence = sequences[selected];
         var name = sequence.Name;
         ImGui.SetNextItemWidth(260f);
-        if (ImGui.InputText("名称", ref name, 80))
+        if (ImGui.InputText("Name", ref name, 80))
         {
-            sequence.Name = string.IsNullOrWhiteSpace(name) ? "未命名序列" : name;
+            sequence.Name = string.IsNullOrWhiteSpace(name) ? "Unnamed Sequence" : name;
             configuration.Save();
         }
         var description = sequence.Description;
         ImGui.SetNextItemWidth(-1f);
-        if (ImGui.InputText("说明", ref description, 200))
+        if (ImGui.InputText("Description", ref description, 200))
         {
             sequence.Description = description;
             configuration.Save();
         }
 
-        if (ImGui.Button("新建序列"))
+        if (ImGui.Button("New Sequence"))
         {
-            sequences.Add(new BeastmasterSequenceDefinition { Name = "新序列", Description = "" });
+            sequences.Add(new BeastmasterSequenceDefinition { Name = "New Sequence", Description = "" });
             configuration.SelectedSequenceIndex = sequences.Count - 1;
             configuration.Save();
         }
         ImGui.SameLine();
-        if (ImGui.Button("复制序列"))
+        if (ImGui.Button("Duplicate Sequence"))
         {
             var copy = BeastmasterSequenceDefinition.TryImport(sequence.Export(), out var imported, out _)
                 ? imported!
                 : BeastmasterSequenceDefinition.CreateWaterOpener();
-            copy.Name += " 副本";
+            copy.Name += " Copy";
             sequences.Add(copy);
             configuration.SelectedSequenceIndex = sequences.Count - 1;
             configuration.Save();
         }
         ImGui.SameLine();
-        if (ImGui.Button("删除序列") && sequences.Count > 1)
+        if (ImGui.Button("Delete Sequence") && sequences.Count > 1)
         {
             sequences.RemoveAt(selected);
             configuration.SelectedSequenceIndex = Math.Clamp(selected, 0, sequences.Count - 1);
             configuration.Save();
         }
         ImGui.SameLine();
-        if (ImGui.Button("恢复虫队模版"))
+        if (ImGui.Button("Restore Bug Team Template"))
         {
             sequences[selected] = BeastmasterSequenceDefinition.CreateWaterOpener();
             configuration.Save();
         }
 
-        DrawSequenceStepList("倒计时", sequence.CountdownSteps, true);
-        DrawSequenceStepList("进入战斗", sequence.CombatSteps, false);
+        DrawSequenceStepList("Countdown", sequence.CountdownSteps, true);
+        DrawSequenceStepList("Enter Combat", sequence.CombatSteps, false);
 
-        if (ImGui.Button("复制导出文本")) ImGui.SetClipboardText(sequence.Export());
+        if (ImGui.Button("Copy Export Text")) ImGui.SetClipboardText(sequence.Export());
         ImGui.SameLine();
-        if (ImGui.Button("从剪贴板导入"))
+        if (ImGui.Button("Import from Clipboard"))
         {
             if (BeastmasterSequenceDefinition.TryImport(ImGui.GetClipboardText(), out var imported, out var error) && imported != null)
             {
                 sequences[selected] = imported;
                 configuration.Save();
             }
-            else debugResult = $"技能序列导入失败：{error}";
+            else debugResult = $"Failed to import skill sequence: {error}";
         }
     }
 
     private void DrawSequenceStepList(string title, List<BeastmasterSequenceStep> steps, bool countdown)
     {
-        if (!ImGui.CollapsingHeader($"{title}步骤##sequence-{title}")) return;
+        if (!ImGui.CollapsingHeader($"{title} Steps##sequence-{title}")) return;
         for (var index = 0; index < steps.Count; index++)
         {
             var step = steps[index];
@@ -932,20 +932,20 @@ public sealed class PluginUI
             {
                 var time = step.TimeSeconds ?? 0f;
                 ImGui.SetNextItemWidth(110f);
-                if (ImGui.InputFloat("时间", ref time, 1f, 5f, "T-%.1f")) step.TimeSeconds = time;
+                if (ImGui.InputFloat("Time", ref time, 1f, 5f, "T-%.1f")) step.TimeSeconds = time;
                 ImGui.SameLine();
             }
             var actionIndex = Array.FindIndex(SequenceActions, action => action.ActionId == step.ActionId);
             var actionOptions = string.Join('\0', SequenceActions.Select(action => action.Name)) + '\0';
             if (actionIndex < 0)
             {
-                ImGui.TextDisabled($"未知技能 ({step.ActionId})");
+                ImGui.TextDisabled($"Unknown skill ({step.ActionId})");
                 ImGui.SameLine();
             }
             else
             {
                 ImGui.SetNextItemWidth(180f);
-                if (ImGui.Combo("技能", ref actionIndex, actionOptions))
+                if (ImGui.Combo("Skill", ref actionIndex, actionOptions))
                 {
                     step.ActionId = SequenceActions[actionIndex].ActionId;
                     step.Label = SequenceActions[actionIndex].Name;
@@ -953,35 +953,35 @@ public sealed class PluginUI
                 ImGui.SameLine();
             }
             ImGui.SameLine();
-            if (ImGui.SmallButton("上移") && index > 0) (steps[index - 1], steps[index]) = (steps[index], steps[index - 1]);
+            if (ImGui.SmallButton("Move Up") && index > 0) (steps[index - 1], steps[index]) = (steps[index], steps[index - 1]);
             ImGui.SameLine();
-            if (ImGui.SmallButton("下移") && index < steps.Count - 1) (steps[index + 1], steps[index]) = (steps[index], steps[index + 1]);
+            if (ImGui.SmallButton("Move Down") && index < steps.Count - 1) (steps[index + 1], steps[index]) = (steps[index], steps[index + 1]);
             ImGui.SameLine();
-            if (ImGui.SmallButton("删除")) { steps.RemoveAt(index); ImGui.PopID(); break; }
+            if (ImGui.SmallButton("Delete")) { steps.RemoveAt(index); ImGui.PopID(); break; }
             ImGui.PopID();
         }
-        if (ImGui.Button($"添加{title}步骤")) steps.Add(new(countdown ? 0f : null, 44879, "碎击斩"));
+        if (ImGui.Button($"Add {title} Step")) steps.Add(new(countdown ? 0f : null, 44879, "Shattering Slash"));
     }
 
     private void DrawRuleEditor()
     {
-        ImGui.Text("规则模式");
-        ImGui.TextDisabled("规则仅在战斗中运行；优先级低于技能序列、高于普通 ACR，并按显示顺序检查第一条命中项。");
+        ImGui.Text("Rule Mode");
+        ImGui.TextDisabled("Rules only run in combat; they take priority below the skill sequence but above normal ACR, and are checked in display order, using the first match.");
         ImGui.Separator();
 
         var enabled = ruleService.Enabled;
         ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1f, 0.82f, 0.25f, 1f));
-        if (ImGui.Checkbox("启用规则模式", ref enabled)) ruleService.SetEnabled(enabled);
+        if (ImGui.Checkbox("Enable Rule Mode", ref enabled)) ruleService.SetEnabled(enabled);
         ImGui.PopStyleColor();
         var diagnosticsEnabled = configuration.RuleDiagnosticsEnabled;
-        if (ImGui.Checkbox("规则诊断", ref diagnosticsEnabled))
+        if (ImGui.Checkbox("Rule Diagnostics", ref diagnosticsEnabled))
         {
             configuration.RuleDiagnosticsEnabled = diagnosticsEnabled;
             configuration.Save();
         }
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip("开启后按当前规则集的诊断级别输出规则成功或失败信息；默认关闭。");
+            ImGui.SetTooltip("When enabled, logs rule success/failure according to the current rule set's diagnostic level; off by default.");
         }
 
         var ruleSets = configuration.RuleSets;
@@ -992,10 +992,10 @@ public sealed class PluginUI
         configuration.SelectedRuleSetIndex = Math.Clamp(configuration.SelectedRuleSetIndex, 0, ruleSets.Count - 1);
 
         ImGui.BeginChild("RuleSetList", new Vector2(220f, 0f), true);
-        ImGui.Text("规则集");
+        ImGui.Text("Rule Set");
         for (var index = 0; index < ruleSets.Count; index++)
         {
-            var label = $"{index + 1:00} {(ruleSets[index].Enabled ? "[启用]" : "[停用]")} {ruleSets[index].Name}";
+            var label = $"{index + 1:00} {(ruleSets[index].Enabled ? "[On]" : "[Off]")} {ruleSets[index].Name}";
             if (ImGui.Selectable($"{label}##rule-set-{index}", configuration.SelectedRuleSetIndex == index))
             {
                 configuration.SelectedRuleSetIndex = index;
@@ -1004,26 +1004,26 @@ public sealed class PluginUI
             }
         }
         ImGui.Separator();
-        if (ImGui.Button("新建规则集", new Vector2(-1f, 0f)))
+        if (ImGui.Button("New Rule Set", new Vector2(-1f, 0f)))
         {
-            ruleSets.Add(new BeastmasterRuleSetDefinition { Name = "新规则集" });
+            ruleSets.Add(new BeastmasterRuleSetDefinition { Name = "New Rule Set" });
             configuration.SelectedRuleSetIndex = ruleSets.Count - 1;
             configuration.SelectedRuleIndex = 0;
             configuration.Save();
         }
-        if (ImGui.Button("复制规则集", new Vector2(-1f, 0f)))
+        if (ImGui.Button("Duplicate Rule Set", new Vector2(-1f, 0f)))
         {
             var source = ruleSets[configuration.SelectedRuleSetIndex];
             if (BeastmasterRuleSetDefinition.TryImport(source.Export(), out var copy, out _) && copy != null)
             {
-                copy.Name += " 副本";
+                copy.Name += " Copy";
                 ruleSets.Add(copy);
                 configuration.SelectedRuleSetIndex = ruleSets.Count - 1;
                 configuration.SelectedRuleIndex = 0;
                 configuration.Save();
             }
         }
-        if (ImGui.Button("删除规则集", new Vector2(-1f, 0f)) && ruleSets.Count > 1)
+        if (ImGui.Button("Delete Rule Set", new Vector2(-1f, 0f)) && ruleSets.Count > 1)
         {
             ruleSets.RemoveAt(configuration.SelectedRuleSetIndex);
             configuration.SelectedRuleSetIndex = Math.Clamp(configuration.SelectedRuleSetIndex, 0, ruleSets.Count - 1);
@@ -1040,10 +1040,10 @@ public sealed class PluginUI
         ImGui.Separator();
         DrawRuleList(ruleSet);
         ImGui.Separator();
-        ImGui.Text("最近诊断");
+        ImGui.Text("Recent Diagnostics");
         ImGui.TextWrapped(ruleService.LastDiagnostic);
         ImGui.TextDisabled(ruleService.LastDiagnosticUtc == DateTime.MinValue
-            ? "尚无运行记录"
+            ? "No run history yet"
             : ruleService.LastDiagnosticUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss.fff"));
         if (!string.IsNullOrWhiteSpace(ruleImportStatus)) ImGui.TextWrapped(ruleImportStatus);
         ImGui.EndChild();
@@ -1052,21 +1052,21 @@ public sealed class PluginUI
     private void DrawRuleSetSettings(BeastmasterRuleSetDefinition ruleSet, int ruleSetIndex)
     {
         var enabled = ruleSet.Enabled;
-        if (ImGui.Checkbox("启用当前规则集", ref enabled))
+        if (ImGui.Checkbox("Enable Current Rule Set", ref enabled))
         {
             ruleSet.Enabled = enabled;
             configuration.Save();
         }
         var name = ruleSet.Name;
         ImGui.SetNextItemWidth(260f);
-        if (ImGui.InputText("名称", ref name, 80))
+        if (ImGui.InputText("Name", ref name, 80))
         {
-            ruleSet.Name = string.IsNullOrWhiteSpace(name) ? "未命名规则集" : name;
+            ruleSet.Name = string.IsNullOrWhiteSpace(name) ? "Unnamed Rule Set" : name;
             configuration.Save();
         }
         var description = ruleSet.Description;
         ImGui.SetNextItemWidth(-1f);
-        if (ImGui.InputText("说明", ref description, 200))
+        if (ImGui.InputText("Description", ref description, 200))
         {
             ruleSet.Description = description;
             configuration.Save();
@@ -1074,18 +1074,18 @@ public sealed class PluginUI
 
         var areaMode = (int)ruleSet.AreaMode;
         ImGui.SetNextItemWidth(180f);
-        if (ImGui.Combo("区域限制", ref areaMode, "所有区域\0仅指定区域\0排除指定区域\0"))
+        if (ImGui.Combo("Zone Restriction", ref areaMode, "All Zones\0Only Specified Zones\0Exclude Specified Zones\0"))
         {
             ruleSet.AreaMode = (BeastmasterRuleAreaMode)areaMode;
             configuration.Save();
         }
         if (ruleSet.AreaMode != BeastmasterRuleAreaMode.All)
         {
-            ImGui.TextDisabled(ruleSet.TerritoryIds.Count == 0 ? "尚未配置 TerritoryType ID" : $"TerritoryType：{string.Join(", ", ruleSet.TerritoryIds)}");
+            ImGui.TextDisabled(ruleSet.TerritoryIds.Count == 0 ? "No TerritoryType ID configured yet" : $"TerritoryType：{string.Join(", ", ruleSet.TerritoryIds)}");
             ImGui.SetNextItemWidth(130f);
-            if (ImGui.InputInt("新增区域 ID", ref newRuleTerritoryId, 1, 10)) newRuleTerritoryId = Math.Max(0, newRuleTerritoryId);
+            if (ImGui.InputInt("New Zone ID", ref newRuleTerritoryId, 1, 10)) newRuleTerritoryId = Math.Max(0, newRuleTerritoryId);
             ImGui.SameLine();
-            if (ImGui.Button("添加区域") && newRuleTerritoryId is > 0 and <= ushort.MaxValue)
+            if (ImGui.Button("Add Zone") && newRuleTerritoryId is > 0 and <= ushort.MaxValue)
             {
                 var territoryId = (ushort)newRuleTerritoryId;
                 if (!ruleSet.TerritoryIds.Contains(territoryId)) ruleSet.TerritoryIds.Add(territoryId);
@@ -1095,7 +1095,7 @@ public sealed class PluginUI
             for (var index = 0; index < ruleSet.TerritoryIds.Count; index++)
             {
                 ImGui.SameLine();
-                if (ImGui.SmallButton($"删除 {ruleSet.TerritoryIds[index]}##territory-{index}"))
+                if (ImGui.SmallButton($"Delete {ruleSet.TerritoryIds[index]}##territory-{index}"))
                 {
                     ruleSet.TerritoryIds.RemoveAt(index);
                     configuration.Save();
@@ -1106,19 +1106,19 @@ public sealed class PluginUI
 
         var diagnosticMode = (int)ruleSet.DiagnosticMode;
         ImGui.SetNextItemWidth(180f);
-        if (ImGui.Combo("规则诊断级别", ref diagnosticMode, "关闭\0仅失败\0完整\0"))
+        if (ImGui.Combo("Rule Diagnostic Level", ref diagnosticMode, "Off\0Failures Only\0Full\0"))
         {
             ruleSet.DiagnosticMode = (BeastmasterRuleDiagnosticMode)diagnosticMode;
             configuration.Save();
         }
 
-        if (ImGui.Button("复制导出文本"))
+        if (ImGui.Button("Copy Export Text"))
         {
             ImGui.SetClipboardText(ruleSet.Export());
-            ruleImportStatus = "当前规则集已复制到剪贴板。";
+            ruleImportStatus = "Current rule set copied to clipboard.";
         }
         ImGui.SameLine();
-        if (ImGui.Button("从剪贴板导入"))
+        if (ImGui.Button("Import from Clipboard"))
         {
             if (BeastmasterRuleSetDefinition.TryImport(ImGui.GetClipboardText(), out var imported, out var error) && imported != null)
             {
@@ -1126,23 +1126,23 @@ public sealed class PluginUI
                 configuration.SelectedRuleSetIndex = configuration.RuleSets.Count - 1;
                 configuration.SelectedRuleIndex = 0;
                 configuration.Save();
-                ruleImportStatus = $"已新增导入规则集“{imported.Name}”。";
+                ruleImportStatus = $"Imported new rule set "{imported.Name}".";
             }
             else
             {
-                ruleImportStatus = $"规则集导入失败：{error}";
+                ruleImportStatus = $"Failed to import rule set: {error}";
             }
         }
 
         ImGui.SameLine();
-        if (ImGui.SmallButton("上移规则集") && ruleSetIndex > 0)
+        if (ImGui.SmallButton("Move Rule Set Up") && ruleSetIndex > 0)
         {
             (configuration.RuleSets[ruleSetIndex - 1], configuration.RuleSets[ruleSetIndex]) = (configuration.RuleSets[ruleSetIndex], configuration.RuleSets[ruleSetIndex - 1]);
             configuration.SelectedRuleSetIndex--;
             configuration.Save();
         }
         ImGui.SameLine();
-        if (ImGui.SmallButton("下移规则集") && ruleSetIndex < configuration.RuleSets.Count - 1)
+        if (ImGui.SmallButton("Move Rule Set Down") && ruleSetIndex < configuration.RuleSets.Count - 1)
         {
             (configuration.RuleSets[ruleSetIndex + 1], configuration.RuleSets[ruleSetIndex]) = (configuration.RuleSets[ruleSetIndex], configuration.RuleSets[ruleSetIndex + 1]);
             configuration.SelectedRuleSetIndex++;
@@ -1152,8 +1152,8 @@ public sealed class PluginUI
 
     private void DrawRuleList(BeastmasterRuleSetDefinition ruleSet)
     {
-        ImGui.Text($"规则（{ruleSet.Rules.Count}/100）");
-        if (ImGui.Button("添加规则") && ruleSet.Rules.Count < 100)
+        ImGui.Text($"Rules ({ruleSet.Rules.Count}/100)");
+        if (ImGui.Button("Add Rule") && ruleSet.Rules.Count < 100)
         {
             ruleSet.Rules.Add(new BeastmasterRuleDefinition());
             configuration.SelectedRuleIndex = ruleSet.Rules.Count - 1;
@@ -1162,7 +1162,7 @@ public sealed class PluginUI
 
         if (ruleSet.Rules.Count == 0)
         {
-            ImGui.TextDisabled("当前规则集没有规则。添加后按从上到下的顺序判断。");
+            ImGui.TextDisabled("This rule set has no rules yet. Once added, they're evaluated top to bottom.");
             return;
         }
 
@@ -1171,7 +1171,7 @@ public sealed class PluginUI
         {
             var rule = ruleSet.Rules[index];
             var selected = configuration.SelectedRuleIndex == index;
-            if (ImGui.Selectable($"{index + 1:00} {(rule.Enabled ? "[启用]" : "[停用]")} {rule.Name}  |  {GetRuleSummary(rule)}##rule-{index}", selected))
+            if (ImGui.Selectable($"{index + 1:00} {(rule.Enabled ? "[On]" : "[Off]")} {rule.Name}  |  {GetRuleSummary(rule)}##rule-{index}", selected))
             {
                 configuration.SelectedRuleIndex = index;
                 configuration.Save();
@@ -1181,31 +1181,31 @@ public sealed class PluginUI
         var selectedIndex = configuration.SelectedRuleIndex;
         var selectedRule = ruleSet.Rules[selectedIndex];
         ImGui.Spacing();
-        ImGui.Text($"编辑第 {selectedIndex + 1} 条规则");
+        ImGui.Text($"Editing Rule {selectedIndex + 1}");
         DrawRuleFields(selectedRule);
 
-        if (ImGui.Button("复制规则") && ruleSet.Rules.Count < 100)
+        if (ImGui.Button("Duplicate Rule") && ruleSet.Rules.Count < 100)
         {
             ruleSet.Rules.Insert(selectedIndex + 1, CloneRule(selectedRule));
             configuration.SelectedRuleIndex++;
             configuration.Save();
         }
         ImGui.SameLine();
-        if (ImGui.Button("上移") && selectedIndex > 0)
+        if (ImGui.Button("Move Up") && selectedIndex > 0)
         {
             (ruleSet.Rules[selectedIndex - 1], ruleSet.Rules[selectedIndex]) = (ruleSet.Rules[selectedIndex], ruleSet.Rules[selectedIndex - 1]);
             configuration.SelectedRuleIndex--;
             configuration.Save();
         }
         ImGui.SameLine();
-        if (ImGui.Button("下移") && selectedIndex < ruleSet.Rules.Count - 1)
+        if (ImGui.Button("Move Down") && selectedIndex < ruleSet.Rules.Count - 1)
         {
             (ruleSet.Rules[selectedIndex + 1], ruleSet.Rules[selectedIndex]) = (ruleSet.Rules[selectedIndex], ruleSet.Rules[selectedIndex + 1]);
             configuration.SelectedRuleIndex++;
             configuration.Save();
         }
         ImGui.SameLine();
-        if (ImGui.Button("删除规则"))
+        if (ImGui.Button("Delete Rule"))
         {
             ruleSet.Rules.RemoveAt(selectedIndex);
             configuration.SelectedRuleIndex = Math.Clamp(selectedIndex, 0, Math.Max(0, ruleSet.Rules.Count - 1));
@@ -1216,23 +1216,23 @@ public sealed class PluginUI
     private void DrawRuleFields(BeastmasterRuleDefinition rule)
     {
         var enabled = rule.Enabled;
-        if (ImGui.Checkbox("启用##selected-rule", ref enabled))
+        if (ImGui.Checkbox("Enabled##selected-rule", ref enabled))
         {
             rule.Enabled = enabled;
             configuration.Save();
         }
         var name = rule.Name;
         ImGui.SetNextItemWidth(260f);
-        if (ImGui.InputText("规则名称", ref name, 80))
+        if (ImGui.InputText("Rule Name", ref name, 80))
         {
-            rule.Name = string.IsNullOrWhiteSpace(name) ? "未命名规则" : name;
+            rule.Name = string.IsNullOrWhiteSpace(name) ? "Unnamed Rule" : name;
             configuration.Save();
         }
 
         rule.EnsureConditions();
         var joinMode = (int)rule.ConditionJoinMode;
         ImGui.SetNextItemWidth(190f);
-        if (ImGui.Combo("条件关系", ref joinMode, "全部满足（AND）\0任意满足（OR）\0"))
+        if (ImGui.Combo("Condition Logic", ref joinMode, "All Must Match (AND)\0Any Can Match (OR)\0"))
         {
             rule.ConditionJoinMode = (BeastmasterRuleConditionJoinMode)joinMode;
             configuration.Save();
@@ -1241,9 +1241,9 @@ public sealed class PluginUI
         for (var conditionIndex = 0; conditionIndex < rule.Conditions.Count; conditionIndex++)
         {
             ImGui.Separator();
-            ImGui.Text($"条件 {conditionIndex + 1}");
+            ImGui.Text($"Condition {conditionIndex + 1}");
             DrawRuleConditionFields(rule, rule.Conditions[conditionIndex], conditionIndex);
-            if (rule.Conditions.Count > 1 && ImGui.Button($"删除条件##rule-condition-delete-{conditionIndex}"))
+            if (rule.Conditions.Count > 1 && ImGui.Button($"Delete Condition##rule-condition-delete-{conditionIndex}"))
             {
                 rule.Conditions.RemoveAt(conditionIndex);
                 rule.SyncLegacyFieldsFromFirstCondition();
@@ -1253,7 +1253,7 @@ public sealed class PluginUI
         }
 
         ImGui.BeginDisabled(rule.Conditions.Count >= 10);
-        if (ImGui.Button("新增条件"))
+        if (ImGui.Button("Add Condition"))
         {
             rule.Conditions.Add(new BeastmasterRuleCondition());
             configuration.Save();
@@ -1262,7 +1262,7 @@ public sealed class PluginUI
 
         var actionType = (int)rule.ActionType;
         ImGui.SetNextItemWidth(120f);
-        if (ImGui.Combo("执行方式", ref actionType, "技能\0奇弈道具\0"))
+        if (ImGui.Combo("Execution Type", ref actionType, "Skill\0Trial Item\0"))
         {
             rule.ActionType = (BeastmasterRuleActionType)actionType;
             configuration.Save();
@@ -1272,7 +1272,7 @@ public sealed class PluginUI
         {
             var itemType = (int)rule.CrucibleItemType;
             ImGui.SetNextItemWidth(190f);
-            if (ImGui.Combo("奇弈道具", ref itemType, "恢复类道具\0各种牙\0闪躲之书\0反射之书\0时之沙\0魔兽刚力药\0吸血鬼之牙\0"))
+            if (ImGui.Combo("Trial Item", ref itemType, "Recovery Items\0Assorted Fangs\0Book of Evasion\0Book of Reflection\0Sands of Time\0Beast Vigor Potion\0Vampire Fang\0"))
             {
                 rule.CrucibleItemType = (BeastmasterCrucibleItemType)itemType;
                 configuration.Save();
@@ -1284,7 +1284,7 @@ public sealed class PluginUI
             if (actionIndex < 0) actionIndex = 0;
             var actionNames = string.Join('\0', BeastmasterRuleActions.Supported.Select(action => $"{action.Name} ({action.ActionId})")) + '\0';
             ImGui.SetNextItemWidth(260f);
-            if (ImGui.Combo("选择技能", ref actionIndex, actionNames))
+            if (ImGui.Combo("Select Skill", ref actionIndex, actionNames))
             {
                 rule.ActionId = BeastmasterRuleActions.Supported[actionIndex].ActionId;
                 configuration.Save();
@@ -1292,14 +1292,14 @@ public sealed class PluginUI
         }
 
         if (!rule.TryValidate(out var error)) ImGui.TextColored(new Vector4(1f, 0.4f, 0.3f, 1f), error);
-        ImGui.TextDisabled("目标技能始终对当前手动目标释放；DataID 对象只负责触发。技能失败后回退 ACR。");
+        ImGui.TextDisabled("The chosen skill is always used on your current manual target; the DataID object is only used as the trigger. If the skill fails, it falls back to ACR.");
     }
 
     private void DrawRuleConditionFields(BeastmasterRuleDefinition rule, BeastmasterRuleCondition condition, int index)
     {
         var type = (int)condition.Type;
         ImGui.SetNextItemWidth(190f);
-        if (ImGui.Combo($"检测类型##condition-{index}", ref type, "自身 BUFF\0目标 BUFF\0DataID BUFF\0DataID 读条\0目标读条\0目标 DATAID\0自身血量\0目标血量\0目标为 BOSS（IsBoss）\0"))
+        if (ImGui.Combo($"Check Type##condition-{index}", ref type, "Self Buff\0Target Buff\0DataID Buff\0DataID Casting\0Target Casting\0Target DataID\0Self HP\0Target HP\0Target Is Boss (IsBoss)\0"))
         {
             condition.Type = (BeastmasterRuleConditionType)type;
             rule.SyncLegacyFieldsFromFirstCondition();
@@ -1310,7 +1310,7 @@ public sealed class PluginUI
         {
             var statusCondition = (int)condition.StatusCondition;
             ImGui.SetNextItemWidth(190f);
-            if (ImGui.Combo($"BUFF 条件##condition-{index}", ref statusCondition, "存在\0缺失\0"))
+            if (ImGui.Combo($"Buff Condition##condition-{index}", ref statusCondition, "Present\0Missing\0"))
             {
                 condition.StatusCondition = (BeastmasterRuleStatusCondition)statusCondition;
                 rule.SyncLegacyFieldsFromFirstCondition();
@@ -1334,7 +1334,7 @@ public sealed class PluginUI
         {
             var hpCondition = (int)condition.HpCondition;
             ImGui.SetNextItemWidth(190f);
-            if (ImGui.Combo($"血量条件##condition-{index}", ref hpCondition, "大于\0小于\0"))
+            if (ImGui.Combo($"HP Condition##condition-{index}", ref hpCondition, "Greater Than\0Less Than\0"))
             {
                 condition.HpCondition = (BeastmasterRuleHpCondition)hpCondition;
                 rule.SyncLegacyFieldsFromFirstCondition();
@@ -1343,7 +1343,7 @@ public sealed class PluginUI
 
             var threshold = condition.HpThreshold;
             ImGui.SetNextItemWidth(190f);
-            if (ImGui.InputFloat($"血量阈值##condition-{index}", ref threshold, 0f, 0f, "%.0f%%"))
+            if (ImGui.InputFloat($"HP Threshold##condition-{index}", ref threshold, 0f, 0f, "%.0f%%"))
             {
                 condition.HpThreshold = Math.Clamp(threshold, 1f, 100f);
                 rule.SyncLegacyFieldsFromFirstCondition();
@@ -1354,7 +1354,7 @@ public sealed class PluginUI
         {
             var conditionId = (int)Math.Min(condition.ConditionId, int.MaxValue);
             ImGui.SetNextItemWidth(190f);
-            var label = condition.IsStatusRule ? "BUFFID" : "读条 ID";
+            var label = condition.IsStatusRule ? "BUFFID" : "Casting ID";
             if (ImGui.InputInt($"{label}##condition-{index}", ref conditionId, 1, 100))
             {
                 condition.ConditionId = (uint)Math.Max(0, conditionId);
@@ -1368,7 +1368,7 @@ public sealed class PluginUI
         => new()
         {
             Enabled = source.Enabled,
-            Name = source.Name + " 副本",
+            Name = source.Name + " Copy",
             ConditionType = source.ConditionType,
             StatusCondition = source.StatusCondition,
             ConditionJoinMode = source.ConditionJoinMode,
@@ -1398,7 +1398,7 @@ public sealed class PluginUI
             rule.ConditionJoinMode == BeastmasterRuleConditionJoinMode.All ? " AND " : " OR ",
             rule.Conditions.Select(GetRuleConditionSummary));
         if (rule.ActionType == BeastmasterRuleActionType.CrucibleItem)
-            return $"{condition} -> 道具 {BeastmasterRuleActions.GetCrucibleItemTypeName(rule.CrucibleItemType)}";
+            return $"{condition} -> Item {BeastmasterRuleActions.GetCrucibleItemTypeName(rule.CrucibleItemType)}";
         var action = BeastmasterRuleActions.Supported.FirstOrDefault(item => item.ActionId == rule.ActionId);
         return $"{condition} -> {(string.IsNullOrEmpty(action.Name) ? rule.ActionId.ToString() : action.Name)}";
     }
@@ -1407,31 +1407,31 @@ public sealed class PluginUI
     {
         var actor = condition.Type switch
         {
-            BeastmasterRuleConditionType.SelfStatus => "自身",
-            BeastmasterRuleConditionType.TargetStatus => "目标",
+            BeastmasterRuleConditionType.SelfStatus => "Self",
+            BeastmasterRuleConditionType.TargetStatus => "Target",
             BeastmasterRuleConditionType.DataIdStatus => $"DataID {condition.DataId}",
             BeastmasterRuleConditionType.DataIdCast => $"DataID {condition.DataId}",
-            BeastmasterRuleConditionType.TargetCast => "目标",
-            BeastmasterRuleConditionType.TargetDataId => $"目标DataID {condition.DataId}",
-            BeastmasterRuleConditionType.SelfHp => "自身血量",
-            BeastmasterRuleConditionType.TargetHp => "目标血量",
-            BeastmasterRuleConditionType.TargetIsBoss => "目标为 BOSS",
-            _ => "未知",
+            BeastmasterRuleConditionType.TargetCast => "Target",
+            BeastmasterRuleConditionType.TargetDataId => $"Target DataID {condition.DataId}",
+            BeastmasterRuleConditionType.SelfHp => "Self HP",
+            BeastmasterRuleConditionType.TargetHp => "Target HP",
+            BeastmasterRuleConditionType.TargetIsBoss => "Target Is Boss",
+            _ => "Unknown",
         };
         if (condition.IsStatusRule)
-            return $"{actor}{(condition.StatusCondition == BeastmasterRuleStatusCondition.Present ? "存在" : "缺少")} BUFF {condition.ConditionId}";
+            return $"{actor}{(condition.StatusCondition == BeastmasterRuleStatusCondition.Present ? "present" : "missing")} BUFF {condition.ConditionId}";
         if (condition.Type == BeastmasterRuleConditionType.TargetDataId)
             return actor;
         if (condition.Type == BeastmasterRuleConditionType.TargetIsBoss)
-            return "目标最大血量 > 自身最大血量 × 5";
+            return "Target's Max HP > Self's Max HP × 5";
         if (condition.IsHealthRule)
             return $"{actor} {(condition.HpCondition == BeastmasterRuleHpCondition.Above ? ">" : "<")} {condition.HpThreshold:0.#}%";
-        return $"{actor}读条 {condition.ConditionId}";
+        return $"{actor} casting {condition.ConditionId}";
     }
 
     private void DrawQuests()
     {
-        ImGui.Text("驯兽师任务链");
+        ImGui.Text("Beastmaster Quest Chain");
         ImGui.SameLine();
         if (ImGui.Button("WIKI##quest-wiki"))
         {
@@ -1442,19 +1442,19 @@ public sealed class PluginUI
         }
 
         ImGui.SameLine();
-        var stopButtonWidth = ImGui.CalcTextSize("停止导航").X + ImGui.GetStyle().FramePadding.X * 2f;
+        var stopButtonWidth = ImGui.CalcTextSize("Stop Navigation").X + ImGui.GetStyle().FramePadding.X * 2f;
         var stopButtonX = ImGui.GetWindowContentRegionMax().X - stopButtonWidth;
         if (ImGui.GetCursorPosX() < stopButtonX)
         {
             ImGui.SetCursorPosX(stopButtonX);
         }
 
-        if (ImGui.Button("停止导航"))
+        if (ImGui.Button("Stop Navigation"))
         {
             navigationService.Stop();
         }
 
-        ImGui.TextDisabled("按客户端任务状态显示进度，并前往未完成任务的接取位置。");
+        ImGui.TextDisabled("Shows progress based on the client's quest status and navigates to pickup locations for incomplete quests.");
         ImGui.Separator();
 
         var quests = BeastmasterQuestGuide.Quests;
@@ -1475,7 +1475,7 @@ public sealed class PluginUI
 
         var hideCompleted = configuration.HideCompletedQuests;
         ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1f, 0.82f, 0.25f, 1f));
-        if (ImGui.Checkbox("隐藏已完成任务", ref hideCompleted))
+        if (ImGui.Checkbox("Hide Completed Quests", ref hideCompleted))
         {
             configuration.HideCompletedQuests = hideCompleted;
             configuration.Save();
@@ -1487,12 +1487,12 @@ public sealed class PluginUI
         {
             if (quest.RowId == 0)
             {
-                ImGui.Text($"{quest.Name}  [待采集]");
+                ImGui.Text($"{quest.Name}  [Coordinates Pending]");
                 ImGui.TextDisabled(quest.Summary);
                 ImGui.BeginDisabled();
-                ImGui.Button("导航到开始 NPC##issuer-pending");
+                ImGui.Button("Navigate to Start NPC##issuer-pending");
                 ImGui.SameLine();
-                ImGui.Button("导航到任务目标##target-pending");
+                ImGui.Button("Navigate to Quest Objective##target-pending");
                 ImGui.EndDisabled();
                 ImGui.Separator();
                 continue;
@@ -1506,33 +1506,33 @@ public sealed class PluginUI
             }
 
             var status = completed
-                ? "已完成"
+                ? "Completed"
                 : questStatus == BeastmasterQuestStatus.Accepted
-                    ? "进行中"
-                    : "未接取";
+                    ? "In Progress"
+                    : "Not Accepted";
             ImGui.Text($"{quest.Name}  [{status}]");
 
             foreach (var prerequisite in questService.GetPrerequisites(quest.RowId))
             {
                 var prerequisiteComplete = questService.GetStatus(prerequisite.RowId) == BeastmasterQuestStatus.Completed;
-                ImGui.TextDisabled($"前置任务：{prerequisite.Name}");
+                ImGui.TextDisabled($"Prerequisite Quest: {prerequisite.Name}");
                 ImGui.SameLine();
                 ImGui.TextColored(
                     prerequisiteComplete
                         ? new Vector4(0.35f, 0.8f, 0.48f, 1f)
                         : new Vector4(0.9f, 0.32f, 0.3f, 1f),
-                    prerequisiteComplete ? "[已完成]" : "[未完成]");
+                    prerequisiteComplete ? "[Completed]" : "[Incomplete]");
             }
 
             if (questService.TryGetIssuerLocation(quest.RowId, out var issuer))
             {
-                ImGui.TextDisabled($"开始 NPC：{issuer.NpcName} · {issuer.Zone}");
+                ImGui.TextDisabled($"Start NPC: {issuer.NpcName} · {issuer.Zone}");
                 if (completed)
                 {
                     ImGui.BeginDisabled();
                 }
 
-                if (ImGui.Button($"导航到开始 NPC##issuer-{quest.RowId}"))
+                if (ImGui.Button($"Navigate to Start NPC##issuer-{quest.RowId}"))
                 {
                     navigationService.Navigate(issuer);
                 }
@@ -1544,7 +1544,7 @@ public sealed class PluginUI
             }
             else
             {
-                ImGui.TextDisabled("开始 NPC：客户端未提供有效接取坐标");
+                ImGui.TextDisabled("Start NPC: the client did not provide valid pickup coordinates");
             }
 
             ImGui.SameLine();
@@ -1556,7 +1556,7 @@ public sealed class PluginUI
                 ImGui.BeginDisabled();
             }
 
-            if (ImGui.Button($"导航到任务目标##target-{quest.RowId}") && hasTarget)
+            if (ImGui.Button($"Navigate to Quest Objective##target-{quest.RowId}") && hasTarget)
             {
                 navigationService.NavigateQuestTarget(target!);
             }
@@ -1566,7 +1566,7 @@ public sealed class PluginUI
                 ImGui.EndDisabled();
                 if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
                 {
-                    ImGui.SetTooltip("当前任务序列的目标坐标尚未采集。 ");
+                    ImGui.SetTooltip("The target coordinates for the current quest step haven't been collected yet. ");
                 }
             }
 
@@ -1579,27 +1579,27 @@ public sealed class PluginUI
     {
         ImGui.Text(title);
         ImGui.Separator();
-        ImGui.TextDisabled("此项目待定。");
+        ImGui.TextDisabled("This item is pending.");
     }
 
     private static void DrawCommands()
     {
-        ImGui.Text("快捷指令");
+        ImGui.Text("Quick Commands");
         ImGui.Separator();
-        DrawGameCommandButton("魔兽图鉴", "/魔兽图鉴");
-        DrawGameCommandButton("驯兽师魔兽-小", "/beastpetsize all small");
-        DrawGameCommandButton("驯兽师魔兽-中", "/beastpetsize all medium");
-        DrawGameCommandButton("驯兽师魔兽-大", "/beastpetsize all large");
+        DrawGameCommandButton("Beast Catalog", "/beastcatalog");
+        DrawGameCommandButton("Beastmaster Beast - Small", "/beastpetsize all small");
+        DrawGameCommandButton("Beastmaster Beast - Medium", "/beastpetsize all medium");
+        DrawGameCommandButton("Beastmaster Beast - Large", "/beastpetsize all large");
     }
 
     private void DrawEquipment()
     {
         RefreshEquipmentOwnership();
-        ImGui.Text("推荐装备");
-        ImGui.TextDisabled("驯兽师 50 级开荒装和 BIS 配置。");
+        ImGui.Text("Recommended Gear");
+        ImGui.TextDisabled("Beastmaster level 50 starter and BIS gear sets.");
         var equipmentSet = selectedEquipmentSet;
         ImGui.SetNextItemWidth(220f);
-        if (ImGui.Combo("装备方案", ref equipmentSet, "开荒装\0BIS\0"))
+        if (ImGui.Combo("Gear Plan", ref equipmentSet, "Starter Gear\0BIS\0"))
         {
             selectedEquipmentSet = equipmentSet;
         }
@@ -1613,10 +1613,10 @@ public sealed class PluginUI
             return;
         }
 
-        ImGui.TableSetupColumn("部位", ImGuiTableColumnFlags.WidthFixed, 90f);
-        ImGui.TableSetupColumn("装备", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupColumn("分类", ImGuiTableColumnFlags.WidthFixed, 70f);
-        ImGui.TableSetupColumn("持有", ImGuiTableColumnFlags.WidthFixed, 210f);
+        ImGui.TableSetupColumn("Slot", ImGuiTableColumnFlags.WidthFixed, 90f);
+        ImGui.TableSetupColumn("Item", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Category", ImGuiTableColumnFlags.WidthFixed, 70f);
+        ImGui.TableSetupColumn("Owned", ImGuiTableColumnFlags.WidthFixed, 210f);
         ImGui.TableHeadersRow();
 
         var entries = selectedEquipmentSet == 0
@@ -1628,7 +1628,7 @@ public sealed class PluginUI
             ImGui.TableNextColumn();
             ImGui.Text(equipment.Slot);
             ImGui.TableNextColumn();
-            if (equipment.Name == "无装备")
+            if (equipment.Name == "No Gear")
             {
                 ImGui.TextDisabled(equipment.Name);
             }
@@ -1639,7 +1639,7 @@ public sealed class PluginUI
                 ImGui.PopStyleColor();
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip("点击访问 Wiki 装备详情");
+                    ImGui.SetTooltip("Click to view item details on the Wiki");
                 }
 
                 if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
@@ -1656,14 +1656,14 @@ public sealed class PluginUI
         ImGui.EndTable();
         ImGui.Spacing();
         ImGui.TextDisabled(selectedEquipmentSet == 0
-            ? "开荒装：优先考虑获取难度和快速成型。"
-            : "BIS：优先考虑 50 级最终战斗属性。 ");
+            ? "Starter Gear: prioritizes ease of acquisition and getting geared quickly."
+            : "BIS: prioritizes final level 50 combat stats. ");
     }
 
     private static void OpenEquipmentWiki(string equipmentName)
     {
         Process.Start(new ProcessStartInfo(
-            $"https://ff14.huijiwiki.com/wiki/{Uri.EscapeDataString($"物品:{equipmentName}")}")
+            $"https://ff14.huijiwiki.com/wiki/{Uri.EscapeDataString($"Item:{equipmentName}")}")
         {
             UseShellExecute = true,
         });
@@ -1671,7 +1671,7 @@ public sealed class PluginUI
 
     private void DrawEquipmentOwnership(BeastmasterEquipmentEntry equipment)
     {
-        if (equipment.Name == "无装备")
+        if (equipment.Name == "No Gear")
         {
             ImGui.TextDisabled("-");
             return;
@@ -1679,7 +1679,7 @@ public sealed class PluginUI
 
         if (!equipmentOwnership.TryGetValue(equipment.Name, out var ownership) || ownership.ItemId == 0)
         {
-            ImGui.TextDisabled("待补 ItemId");
+            ImGui.TextDisabled("ItemId Pending");
             return;
         }
 
@@ -1688,16 +1688,16 @@ public sealed class PluginUI
         var armoryCount = ownership.ArmoryCount;
         if (equippedCount > 0)
         {
-            ImGui.TextColored(new Vector4(0.4f, 0.9f, 0.5f, 1f), $"已装备 ({equippedCount})");
+            ImGui.TextColored(new Vector4(0.4f, 0.9f, 0.5f, 1f), $"Equipped ({equippedCount})");
             ImGui.SameLine();
         }
         ImGui.TextColored(
             inventoryCount > 0 ? new Vector4(0.4f, 0.9f, 0.5f, 1f) : new Vector4(0.65f, 0.65f, 0.7f, 1f),
-            inventoryCount > 0 ? $"背包 有 ({inventoryCount})" : "背包 无");
+            inventoryCount > 0 ? $"In Inventory ({inventoryCount})" : "Not in Inventory");
         ImGui.SameLine();
         ImGui.TextColored(
             armoryCount > 0 ? new Vector4(0.4f, 0.8f, 1f, 1f) : new Vector4(0.65f, 0.65f, 0.7f, 1f),
-            armoryCount > 0 ? $"兵装库 有 ({armoryCount})" : "兵装库 无");
+            armoryCount > 0 ? $"In Armoury Chest ({armoryCount})" : "Not in Armoury Chest");
     }
 
     private void RefreshEquipmentOwnership()
@@ -1711,7 +1711,7 @@ public sealed class PluginUI
         var selectedEntries = selectedEquipmentSet == 0
             ? BeastmasterEquipmentGuide.Level50Starter
             : BeastmasterEquipmentGuide.Level50BestInSlot;
-        foreach (var equipment in selectedEntries.Where(item => item.Name != "无装备"))
+        foreach (var equipment in selectedEntries.Where(item => item.Name != "No Gear"))
         {
             if (equipment.ItemId == 0)
             {
@@ -1756,31 +1756,31 @@ public sealed class PluginUI
 
     private static IEnumerable<GameInventoryType> ArmoryTypes(string slot)
     {
-        if (slot == "主手") yield return GameInventoryType.ArmoryMainHand;
-        else if (slot == "副手") yield return GameInventoryType.ArmoryOffHand;
-        else if (slot == "头部") yield return GameInventoryType.ArmoryHead;
-        else if (slot == "身体") yield return GameInventoryType.ArmoryBody;
-        else if (slot == "手部") yield return GameInventoryType.ArmoryHands;
-        else if (slot == "腿部") yield return GameInventoryType.ArmoryLegs;
-        else if (slot == "脚部") yield return GameInventoryType.ArmoryFeets;
-        else if (slot == "耳饰") yield return GameInventoryType.ArmoryEar;
-        else if (slot == "项链") yield return GameInventoryType.ArmoryNeck;
-        else if (slot == "手镯") yield return GameInventoryType.ArmoryWrist;
-        else if (slot.StartsWith("戒指", StringComparison.Ordinal)) yield return GameInventoryType.ArmoryRings;
-        else if (slot == "职业证") yield return GameInventoryType.ArmorySoulCrystal;
+        if (slot == "Main Hand") yield return GameInventoryType.ArmoryMainHand;
+        else if (slot == "Off Hand") yield return GameInventoryType.ArmoryOffHand;
+        else if (slot == "Head") yield return GameInventoryType.ArmoryHead;
+        else if (slot == "Body") yield return GameInventoryType.ArmoryBody;
+        else if (slot == "Hands") yield return GameInventoryType.ArmoryHands;
+        else if (slot == "Legs") yield return GameInventoryType.ArmoryLegs;
+        else if (slot == "Feet") yield return GameInventoryType.ArmoryFeets;
+        else if (slot == "Earrings") yield return GameInventoryType.ArmoryEar;
+        else if (slot == "Necklace") yield return GameInventoryType.ArmoryNeck;
+        else if (slot == "Bracelet") yield return GameInventoryType.ArmoryWrist;
+        else if (slot.StartsWith("Ring", StringComparison.Ordinal)) yield return GameInventoryType.ArmoryRings;
+        else if (slot == "Soul Crystal") yield return GameInventoryType.ArmorySoulCrystal;
     }
 
     private static void DrawGameCommandButton(string label, string command)
     {
         if (ImGui.Button(label) && !GameCommandService.Execute(command))
         {
-            DalamudApi.ChatGui.Print($"[驯兽师助手] 无法执行 {command}。");
+            DalamudApi.ChatGui.Print($"[Beastmaster Assistant] Unable to execute {command}.");
         }
     }
 
     private void DrawCatalog()
     {
-        ImGui.Text("魔兽图鉴");
+        ImGui.Text("Beast Catalog");
         ImGui.SameLine();
         if (ImGui.Button("WIKI"))
         {
@@ -1791,28 +1791,28 @@ public sealed class PluginUI
         }
 
         ImGui.SameLine();
-        var stopButtonWidth = ImGui.CalcTextSize("停止导航").X + ImGui.GetStyle().FramePadding.X * 2f;
+        var stopButtonWidth = ImGui.CalcTextSize("Stop Navigation").X + ImGui.GetStyle().FramePadding.X * 2f;
         var stopButtonX = ImGui.GetWindowContentRegionMax().X - stopButtonWidth;
         if (ImGui.GetCursorPosX() < stopButtonX)
         {
             ImGui.SetCursorPosX(stopButtonX);
         }
 
-        if (ImGui.Button("停止导航##catalog-stop-navigation"))
+        if (ImGui.Button("Stop Navigation##catalog-stop-navigation"))
         {
             navigationService.Stop();
         }
 
-        ImGui.TextDisabled("同步说明 (?)");
+        ImGui.TextDisabled("Sync Notes (?)");
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip("捕获成功时自动记录，也可按当前角色手动修改完成状态。\n结算同步：每轮结算后自动刷新参战魔兽。\n原生图鉴：与劳妲对话打开原生魔兽图鉴后点「同步兽级经验」自动遍历全部魔兽。\n25级：满级经验显示为 --/--，未同步数据显示 --。");
+            ImGui.SetTooltip("Automatically recorded on a successful capture; you can also manually edit completion status per character.\nResult Sync: automatically refreshes the beasts that fought after each round's results.\nNative Catalog: talk to Rowena to open the native beast catalog, then click "Sync Beast Level EXP" to automatically go through all beasts.\nLevel 25: max-level EXP shows as --/--, unsynced data shows as --.");
         }
 
         var entries = BeastmasterCatalog.Entries;
         var catalogCompletedCount = entries.Count(entry => progressService.IsCompleted(entry.Key));
 
-        if (ImGui.Button("同步已解锁魔兽"))
+        if (ImGui.Button("Sync Unlocked Beasts"))
         {
             catalogSyncService.RequestSync();
         }
@@ -1826,20 +1826,20 @@ public sealed class PluginUI
         if (!string.IsNullOrWhiteSpace(catalogSyncService.Diagnostic))
         {
             ImGui.SameLine();
-            if (ImGui.Button("复制图鉴诊断"))
+            if (ImGui.Button("Copy Catalog Diagnostics"))
             {
                 ImGui.SetClipboardText(catalogSyncService.Diagnostic);
             }
         }
 
         ImGui.SameLine();
-        if (ImGui.Button("同步兽级经验"))
+        if (ImGui.Button("Sync Beast Level EXP"))
         {
             notebookSyncService.RequestSync();
         }
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip("先找劳妲对话打开原生魔兽图鉴，再点击同步。");
+            ImGui.SetTooltip("First talk to Rowena to open the native beast catalog, then click sync.");
         }
         if (notebookSyncService.IsScanning)
         {
@@ -1854,7 +1854,7 @@ public sealed class PluginUI
             ImGui.SameLine();
             ImGui.TextDisabled(notebookSyncService.Status);
             ImGui.SameLine();
-            if (ImGui.Button("复制等级诊断"))
+            if (ImGui.Button("Copy Level Diagnostics"))
             {
                 ImGui.SetClipboardText(notebookSyncService.Diagnostic);
             }
@@ -1865,14 +1865,14 @@ public sealed class PluginUI
         var sortByLocation = configuration.SortCatalogByLocation;
         var hideCaptured = configuration.HideCapturedBeasts;
         ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1f, 0.82f, 0.25f, 1f));
-        if (ImGui.Checkbox("按地图排序", ref sortByLocation))
+        if (ImGui.Checkbox("Sort by Map", ref sortByLocation))
         {
             configuration.SortCatalogByLocation = sortByLocation;
             configuration.Save();
         }
         ImGui.SameLine();
         var sortByLevel = configuration.SortCatalogByLevel;
-        if (ImGui.Checkbox("按捕获等级排序", ref sortByLevel))
+        if (ImGui.Checkbox("Sort by Capture Level", ref sortByLevel))
         {
             configuration.SortCatalogByLevel = sortByLevel;
             if (sortByLevel) configuration.SortCatalogByBeastLevel = false;
@@ -1880,7 +1880,7 @@ public sealed class PluginUI
         }
         ImGui.SameLine();
         var sortByBeastLevel = configuration.SortCatalogByBeastLevel;
-        if (ImGui.Checkbox("按兽级排序", ref sortByBeastLevel))
+        if (ImGui.Checkbox("Sort by Beast Level", ref sortByBeastLevel))
         {
             configuration.SortCatalogByBeastLevel = sortByBeastLevel;
             if (sortByBeastLevel) configuration.SortCatalogByLevel = false;
@@ -1890,14 +1890,14 @@ public sealed class PluginUI
         {
             ImGui.SameLine();
             var descending = configuration.SortCatalogByBeastLevelDescending;
-            if (ImGui.Checkbox("兽级逆序", ref descending))
+            if (ImGui.Checkbox("Reverse Beast Level Order", ref descending))
             {
                 configuration.SortCatalogByBeastLevelDescending = descending;
                 configuration.Save();
             }
         }
         ImGui.SameLine();
-        if (ImGui.Checkbox("隐藏已捕获魔兽", ref hideCaptured))
+        if (ImGui.Checkbox("Hide Captured Beasts", ref hideCaptured))
         {
             configuration.HideCapturedBeasts = hideCaptured;
             configuration.Save();
@@ -1927,16 +1927,16 @@ public sealed class PluginUI
             return;
         }
 
-        ImGui.TableSetupColumn("完成", ImGuiTableColumnFlags.WidthFixed, 46f);
-        ImGui.TableSetupColumn("编号 / 魔兽", ImGuiTableColumnFlags.WidthFixed, 150f);
-        ImGui.TableSetupColumn("属性", ImGuiTableColumnFlags.WidthFixed, 48f);
-        ImGui.TableSetupColumn("技能", ImGuiTableColumnFlags.WidthFixed, 118f);
-        ImGui.TableSetupColumn("捕获等级", ImGuiTableColumnFlags.WidthFixed, 66f);
-        ImGui.TableSetupColumn("兽级", ImGuiTableColumnFlags.WidthFixed, 42f);
-        ImGui.TableSetupColumn("经验", ImGuiTableColumnFlags.WidthFixed, 62f);
-        ImGui.TableSetupColumn("区域 / 副本", ImGuiTableColumnFlags.WidthStretch);
-        ImGui.TableSetupColumn("坐标", ImGuiTableColumnFlags.WidthFixed, 112f);
-        ImGui.TableSetupColumn("导航", ImGuiTableColumnFlags.WidthFixed, 62f);
+        ImGui.TableSetupColumn("Done", ImGuiTableColumnFlags.WidthFixed, 46f);
+        ImGui.TableSetupColumn("No. / Beast", ImGuiTableColumnFlags.WidthFixed, 150f);
+        ImGui.TableSetupColumn("Attribute", ImGuiTableColumnFlags.WidthFixed, 48f);
+        ImGui.TableSetupColumn("Skill", ImGuiTableColumnFlags.WidthFixed, 118f);
+        ImGui.TableSetupColumn("Capture Level", ImGuiTableColumnFlags.WidthFixed, 66f);
+        ImGui.TableSetupColumn("Beast Level", ImGuiTableColumnFlags.WidthFixed, 42f);
+        ImGui.TableSetupColumn("EXP", ImGuiTableColumnFlags.WidthFixed, 62f);
+        ImGui.TableSetupColumn("Zone / Duty", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("Coordinates", ImGuiTableColumnFlags.WidthFixed, 112f);
+        ImGui.TableSetupColumn("Navigate", ImGuiTableColumnFlags.WidthFixed, 62f);
         ImGui.TableHeadersRow();
 
         var canEdit = progressService.CurrentCharacterKey.Length > 0;
@@ -1992,8 +1992,8 @@ public sealed class PluginUI
             if (ImGui.IsItemHovered())
             {
                 ImGui.BeginTooltip();
-                DrawActionTooltip("大招", entry.UltimateActionId);
-                DrawActionTooltip("释放", entry.ReleaseActionId);
+                DrawActionTooltip("Ultimate", entry.UltimateActionId);
+                DrawActionTooltip("Release", entry.ReleaseActionId);
                 ImGui.EndTooltip();
             }
             ImGui.TableNextColumn();
@@ -2009,7 +2009,7 @@ public sealed class PluginUI
                     : $"{beastProgress.Experience}/{beastProgress.ExperienceRequired}");
             if (beastProgress != null && ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip($"最近同步：{beastProgress.UpdatedUtc.ToLocalTime():yyyy-MM-dd HH:mm:ss}");
+                ImGui.SetTooltip($"Last Synced: {beastProgress.UpdatedUtc.ToLocalTime():yyyy-MM-dd HH:mm:ss}");
             }
             ImGui.TableNextColumn();
             ImGui.TextUnformatted(entry.Location);
@@ -2020,13 +2020,13 @@ public sealed class PluginUI
                 && entry.MapX.HasValue
                 && entry.MapY.HasValue)
             {
-                if (ImGui.SmallButton($"导航##catalog-nav-{entry.Number}"))
+                if (ImGui.SmallButton($"Navigate##catalog-nav-{entry.Number}"))
                 {
                     navigationService.Navigate(entry);
                 }
             }
             else if (entry.LocationType == BeastmasterCatalogLocationType.Duty
-                && ImGui.SmallButton($"副本##catalog-duty-{entry.Number}"))
+                && ImGui.SmallButton($"Duty##catalog-duty-{entry.Number}"))
             {
                 navigationService.OpenDutyFinder(entry);
             }
@@ -2064,17 +2064,17 @@ public sealed class PluginUI
 
     private void DrawBeastArena()
     {
-        ImGui.Text("斗兽奇弈");
+        ImGui.Text("Beast Arena Trials");
         ImGui.Separator();
         if (!ImGui.BeginTabBar("BeastArenaTabs"))
         {
             return;
         }
 
-        DrawBeastArenaTab("party", "奇盘编队", DrawPartyPresets);
-        DrawBeastArenaTab("achievements", "斗兽成就", DrawBeastArenaAchievements);
-        DrawBeastArenaTab("guide", "斗兽攻略", DrawBeastArenaGuide);
-        DrawBeastArenaTab("challenge-note", "挑战笔记", DrawBeastArenaChallengeNote);
+        DrawBeastArenaTab("party", "Trial Formation", DrawPartyPresets);
+        DrawBeastArenaTab("achievements", "Beast Arena Achievements", DrawBeastArenaAchievements);
+        DrawBeastArenaTab("guide", "Beast Arena Guide", DrawBeastArenaGuide);
+        DrawBeastArenaTab("challenge-note", "Challenge Log", DrawBeastArenaChallengeNote);
         ImGui.EndTabBar();
         arenaTabSelectionInitialized = true;
         wasInAchievementsTab = configuration.SelectedArenaTab == "achievements";
@@ -2108,14 +2108,14 @@ public sealed class PluginUI
         }
 
         ImGui.Spacing();
-        ImGui.Text("斗兽成就");
+        ImGui.Text("Beast Arena Achievements");
         ImGui.SameLine();
-        ImGui.TextDisabled("按角色保存，打开页签自动同步完成情况。");
+        ImGui.TextDisabled("Saved per character; opening this tab automatically syncs completion status.");
         ImGui.Spacing();
 
         if (!string.IsNullOrWhiteSpace(achievementSyncService.Diagnostic))
         {
-            if (ImGui.Button("复制同步诊断"))
+            if (ImGui.Button("Copy Sync Diagnostics"))
             {
                 ImGui.SetClipboardText(achievementSyncService.Diagnostic);
             }
@@ -2144,14 +2144,14 @@ public sealed class PluginUI
 
         ImGui.Spacing();
         var hideCompletedAchievements = configuration.HideCompletedAchievements;
-        if (ImGui.Checkbox("隐藏已完成", ref hideCompletedAchievements))
+        if (ImGui.Checkbox("Hide Completed", ref hideCompletedAchievements))
         {
             configuration.HideCompletedAchievements = hideCompletedAchievements;
             configuration.Save();
         }
 
         ImGui.Spacing();
-        ImGui.TextColored(new Vector4(1f, 0.82f, 0.25f, 1f), "传说级驯兽师分数线");
+        ImGui.TextColored(new Vector4(1f, 0.82f, 0.25f, 1f), "Legendary Beastmaster Score Threshold");
         ImGui.TextDisabled(string.Join(" · ", BeastmasterAchievementCatalog.LegendaryPoints.Select(point => $"{point.Arena} {point.Points}")));
         ImGui.Spacing();
 
@@ -2170,7 +2170,7 @@ public sealed class PluginUI
 
                 if (!achievementSheet.TryGetRow((uint)achievementId, out var achievement))
                 {
-                    ImGui.TextDisabled($"#{achievementId} 未找到成就资料");
+                    ImGui.TextDisabled($"Achievement data not found for #{achievementId}");
                     continue;
                 }
 
@@ -2192,7 +2192,7 @@ public sealed class PluginUI
                 ImGui.SameLine();
                 ImGui.TextDisabled($"[{points}]");
                 ImGui.SameLine();
-                ImGui.TextColored(stateColor, isCompleted ? "[已完成]" : "[未完成]");
+                ImGui.TextColored(stateColor, isCompleted ? "[Completed]" : "[Incomplete]");
 
                 if (!string.IsNullOrWhiteSpace(description))
                 {
@@ -2201,7 +2201,7 @@ public sealed class PluginUI
 
                 if (!string.IsNullOrWhiteSpace(titleText))
                 {
-                    ImGui.TextDisabled($"  称号：{titleText}");
+                    ImGui.TextDisabled($"  Title: {titleText}");
                 }
             }
 
@@ -2212,21 +2212,21 @@ public sealed class PluginUI
     private static void DrawBeastArenaChallengeNote()
     {
         ImGui.Spacing();
-        ImGui.Text("挑战笔记");
+        ImGui.Text("Challenge Log");
         ImGui.SameLine();
-        ImGui.TextDisabled("打开时同步「斗兽奇弈」相关挑战的完成情况。");
+        ImGui.TextDisabled("Syncs completion status for "Beast Arena Trials" related challenges when opened.");
         ImGui.Spacing();
 
         var entries = BeastmasterChallengeNote.GetBeastArenaEntries();
         if (entries.Count == 0)
         {
-            ImGui.TextDisabled("未找到「斗兽奇弈」相关的挑战笔记条目。");
+            ImGui.TextDisabled("No "Beast Arena Trials" related Challenge Log entries found.");
             return;
         }
 
         if (!BeastmasterChallengeNote.IsLoaded())
         {
-            ImGui.TextColored(new Vector4(1f, 0.6f, 0.3f, 1f), "挑战笔记数据尚未加载，请先在游戏内打开一次挑战笔记。");
+            ImGui.TextColored(new Vector4(1f, 0.6f, 0.3f, 1f), "Challenge Log data hasn't loaded yet; please open the Challenge Log in-game first.");
             return;
         }
 
@@ -2241,7 +2241,7 @@ public sealed class PluginUI
                 ? new Vector4(0.35f, 0.8f, 0.48f, 1f)
                 : new Vector4(0.9f, 0.32f, 0.3f, 1f);
 
-            ImGui.TextColored(color, isCompleted ? "[已完成]" : "[未完成]");
+            ImGui.TextColored(color, isCompleted ? "[Completed]" : "[Incomplete]");
             ImGui.SameLine();
             ImGui.TextColored(color, entry.Name);
             if (!string.IsNullOrWhiteSpace(entry.Description) && ImGui.IsItemHovered())
@@ -2254,7 +2254,7 @@ public sealed class PluginUI
     private static void DrawBeastArenaGuide()
     {
         ImGui.Spacing();
-        ImGui.Text("斗兽攻略");
+        ImGui.Text("Beast Arena Guide");
         ImGui.Separator();
 
         if (!ImGui.BeginTabBar("BeastArenaGuideTabs"))
@@ -2262,11 +2262,11 @@ public sealed class PluginUI
             return;
         }
 
-        DrawGuideFloor("第一盘", null);
-        DrawGuideFloor("第二盘", null);
-        DrawGuideFloor("第三盘", BeastmasterArenaGuide.Round3, BeastmasterArenaGuide.Round3Author);
-        DrawGuideFloor("高段第一盘", null);
-        DrawGuideFloor("高段第二盘", null);
+        DrawGuideFloor("Round 1", null);
+        DrawGuideFloor("Round 2", null);
+        DrawGuideFloor("Round 3", BeastmasterArenaGuide.Round3, BeastmasterArenaGuide.Round3Author);
+        DrawGuideFloor("Advanced Round 1", null);
+        DrawGuideFloor("Advanced Round 2", null);
 
         ImGui.EndTabBar();
     }
@@ -2280,15 +2280,15 @@ public sealed class PluginUI
 
         if (rounds == null || rounds.Count == 0)
         {
-            ImGui.TextDisabled("该层攻略资料待补充。");
+            ImGui.TextDisabled("Guide data for this floor is pending.");
         }
         else
         {
-            ImGui.TextDisabled("黄色为 BOSS，灰色为小怪，红色为重点技能。");
+            ImGui.TextDisabled("Yellow marks the boss, gray marks minions, and red marks key skills.");
             if (!string.IsNullOrWhiteSpace(author))
             {
                 ImGui.SameLine();
-                ImGui.TextDisabled($"作者：{author}");
+                ImGui.TextDisabled($"Author: {author}");
             }
             ImGui.Spacing();
             foreach (var round in rounds)
@@ -2304,23 +2304,23 @@ public sealed class PluginUI
                 var minions = string.Join("、", round.Monsters.Where(monster => !monster.IsBoss).Select(monster => monster.Name));
                 if (minions.Length > 0)
                 {
-                    DrawWrappedColoredText($"小怪：{minions}", new Vector4(0.58f, 0.62f, 0.7f, 1f));
+                    DrawWrappedColoredText($"Minions: {minions}", new Vector4(0.58f, 0.62f, 0.7f, 1f));
                 }
 
                 var highlights = ExtractGuideHighlights(round.Mechanic);
                 if (highlights.Count > 0)
                 {
-                    DrawWrappedColoredText($"重点：{string.Join("、", highlights)}", new Vector4(1f, 0.45f, 0.4f, 1f));
+                    DrawWrappedColoredText($"Key Points: {string.Join("、", highlights)}", new Vector4(1f, 0.45f, 0.4f, 1f));
                 }
 
                 if (!string.IsNullOrWhiteSpace(round.Mechanic))
                 {
-                    ImGui.TextWrapped($"机制：{round.Mechanic}");
+                    ImGui.TextWrapped($"Mechanic: {round.Mechanic}");
                 }
 
                 if (!string.IsNullOrWhiteSpace(round.Comment))
                 {
-                    DrawWrappedColoredText($"偷偷说：{round.Comment}", new Vector4(0.58f, 0.62f, 0.7f, 1f));
+                    DrawWrappedColoredText($"Psst: {round.Comment}", new Vector4(0.58f, 0.62f, 0.7f, 1f));
                 }
 
                 ImGui.Separator();
@@ -2371,7 +2371,7 @@ public sealed class PluginUI
     {
         ImGui.Spacing();
         ImGui.TextColored(new Vector4(1f, 0.3f, 0.25f, 1f),
-            "预设栏位可选 10/12/14/15；应用时按当前游戏编队栏位数量截断或保留空余。");
+            "Preset slots can be 10/12/14/15; when applied, they're trimmed or left with empty slots based on your current in-game formation size.");
         ImGui.Separator();
 
         var presets = configuration.PartyPresets;
@@ -2383,30 +2383,30 @@ public sealed class PluginUI
         }
 
         var selectedIndex = Math.Clamp(configuration.SelectedPartyPresetIndex, 0, presets.Count - 1);
-        if (ImGui.Button("新建"))
+        if (ImGui.Button("New"))
         {
-            presets.Add(new BeastmasterPartyPreset { Name = GetUniquePartyPresetName(presets, "10栏位编队") });
+            presets.Add(new BeastmasterPartyPreset { Name = GetUniquePartyPresetName(presets, "10-Slot Formation") });
             configuration.SelectedPartyPresetIndex = presets.Count - 1;
-            partyPresetStatus = "已新建编队预设。";
+            partyPresetStatus = "New formation preset created.";
             configuration.Save();
         }
         ImGui.SameLine();
-        if (ImGui.Button("复制"))
+        if (ImGui.Button("Duplicate"))
         {
             var copy = presets[selectedIndex].Clone();
             copy.Name = GetUniquePartyPresetName(presets, copy.Name);
             presets.Add(copy);
             configuration.SelectedPartyPresetIndex = presets.Count - 1;
-            partyPresetStatus = "已复制当前预设。";
+            partyPresetStatus = "Current preset duplicated.";
             configuration.Save();
         }
         ImGui.SameLine();
         ImGui.BeginDisabled(presets.Count <= 1);
-        if (ImGui.Button("删除"))
+        if (ImGui.Button("Delete"))
         {
             presets.RemoveAt(selectedIndex);
             configuration.SelectedPartyPresetIndex = Math.Clamp(selectedIndex, 0, presets.Count - 1);
-            partyPresetStatus = "已删除当前预设。";
+            partyPresetStatus = "Current preset deleted.";
             configuration.Save();
         }
         ImGui.EndDisabled();
@@ -2414,17 +2414,17 @@ public sealed class PluginUI
         ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.61f, 0.34f, 0.21f, 1f));
         ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(0.73f, 0.44f, 0.28f, 1f));
         ImGui.PushStyleColor(ImGuiCol.ButtonActive, new Vector4(0.52f, 0.27f, 0.17f, 1f));
-        if (ImGui.Button("分享"))
+        if (ImGui.Button("Share"))
         {
             ImGui.SetClipboardText(presets[selectedIndex].Export());
-            partyPresetStatus = "当前编队预设已复制到剪贴板。";
+            partyPresetStatus = "Current formation preset copied to clipboard.";
         }
         ImGui.PopStyleColor(3);
         ImGui.SameLine();
         ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.55f, 0.31f, 0.34f, 1f));
         ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(0.67f, 0.41f, 0.44f, 1f));
         ImGui.PushStyleColor(ImGuiCol.ButtonActive, new Vector4(0.47f, 0.25f, 0.28f, 1f));
-        if (ImGui.Button("导入"))
+        if (ImGui.Button("Import"))
         {
             if (BeastmasterPartyPreset.TryImport(ImGui.GetClipboardText(), out var imported, out var error)
                 && imported != null)
@@ -2432,12 +2432,12 @@ public sealed class PluginUI
                 imported.Name = GetUniquePartyPresetName(presets, imported.Name);
                 presets.Add(imported);
                 configuration.SelectedPartyPresetIndex = presets.Count - 1;
-                partyPresetStatus = "已从剪贴板导入编队预设。";
+                partyPresetStatus = "Formation preset imported from clipboard.";
                 configuration.Save();
             }
             else
             {
-                partyPresetStatus = $"导入失败：{error}";
+                partyPresetStatus = $"Import failed: {error}";
             }
         }
         ImGui.PopStyleColor(3);
@@ -2446,7 +2446,7 @@ public sealed class PluginUI
         var selectedPreset = presets[selectedIndex];
         ImGui.BeginDisabled(!petPartyService.Snapshot.Available || petPartyService.IsApplying || !CanApplyPartyPreset(selectedPreset));
         PushPartyApplyButtonStyle();
-        if (ImGui.Button(petPartyService.IsApplying ? "应用中..." : "应用编队", new Vector2(110f, 0f)))
+        if (ImGui.Button(petPartyService.IsApplying ? "Applying..." : "Apply Formation", new Vector2(110f, 0f)))
         {
             petPartyService.TryApply(selectedPreset);
         }
@@ -2456,7 +2456,7 @@ public sealed class PluginUI
         var presetNames = string.Join('\0', presets.Select(item => item.Name)) + '\0';
         selectedIndex = Math.Clamp(configuration.SelectedPartyPresetIndex, 0, presets.Count - 1);
         ImGui.SetNextItemWidth(300f);
-        if (ImGui.Combo("编队预设", ref selectedIndex, presetNames))
+        if (ImGui.Combo("Formation Presets", ref selectedIndex, presetNames))
         {
             configuration.SelectedPartyPresetIndex = selectedIndex;
             configuration.Save();
@@ -2466,7 +2466,7 @@ public sealed class PluginUI
         var preset = presets[selectedIndex];
         var name = preset.Name;
         ImGui.SetNextItemWidth(135f);
-        if (ImGui.InputText("预设名称", ref name, 100) && !string.IsNullOrWhiteSpace(name))
+        if (ImGui.InputText("Preset Name", ref name, 100) && !string.IsNullOrWhiteSpace(name))
         {
             preset.Name = name.Trim();
             configuration.Save();
@@ -2476,7 +2476,7 @@ public sealed class PluginUI
         var slotCount = preset.SlotCount;
         var slotIndex = slotCount switch { 12 => 1, 14 => 2, 15 => 3, _ => 0 };
         ImGui.SetNextItemWidth(100f);
-        if (ImGui.Combo("预设栏位", ref slotIndex, "10 个\0 12 个\0 14 个\0 15 个\0"))
+        if (ImGui.Combo("Preset Slots", ref slotIndex, "10\0 12\0 14\0 15\0"))
         {
             preset.SlotCount = slotIndex switch { 1 => 12, 2 => 14, 3 => 15, _ => 10 };
             if (preset.Members.Count > preset.SlotCount)
@@ -2486,13 +2486,13 @@ public sealed class PluginUI
             configuration.Save();
         }
 
-        ImGui.Text($"预设成员：{preset.Members.Count}/{preset.SlotCount}");
+        ImGui.Text($"Preset Members: {preset.Members.Count}/{preset.SlotCount}");
         if (petPartyService.Snapshot.Available && preset.SlotCount != petPartyService.Snapshot.Capacity)
         {
             var difference = petPartyService.Snapshot.Capacity - preset.SlotCount;
             ImGui.TextColored(new Vector4(1f, 0.75f, 0.25f, 1f), difference < 0
-                ? $"当前编队只有 {petPartyService.Snapshot.Capacity} 个栏位，将只应用预设前 {petPartyService.Snapshot.Capacity} 个位置。"
-                : $"当前编队有 {petPartyService.Snapshot.Capacity} 个栏位，应用后将空余 {difference} 个位置。");
+                ? $"Your current formation only has {petPartyService.Snapshot.Capacity} slots, so only the first {petPartyService.Snapshot.Capacity} positions of the preset will be applied."
+                : $"Your current formation has {petPartyService.Snapshot.Capacity} slots; {difference} of them will be left empty after applying.");
         }
         var availableBeasts = BeastmasterCatalog.Entries
             .Where(entry => progressService.IsCompleted(entry.Key))
@@ -2500,7 +2500,7 @@ public sealed class PluginUI
         for (var position = 0; position < preset.SlotCount; position++)
         {
             var currentNumber = position < preset.Members.Count ? preset.Members[position] : 0;
-            var options = new List<(int Number, string Label)> { (0, "-- 空位 --") };
+            var options = new List<(int Number, string Label)> { (0, "-- Empty --") };
             options.AddRange(availableBeasts.Select(entry =>
             {
                 var progress = progressService.GetBeastProgress(entry.Number);
@@ -2511,7 +2511,7 @@ public sealed class PluginUI
             var optionIndex = options.FindIndex(option => option.Number == currentNumber);
             if (optionIndex < 0) optionIndex = 0;
             ImGui.SetNextItemWidth(330f);
-            if (ImGui.Combo($"位置 {position + 1:00}##party-member-{position}", ref optionIndex,
+            if (ImGui.Combo($"Slot {position + 1:00}##party-member-{position}", ref optionIndex,
                     string.Join('\0', options.Select(option => option.Label)) + '\0'))
             {
                 SetPartyPresetMember(preset, position, options[optionIndex].Number);
@@ -2530,7 +2530,7 @@ public sealed class PluginUI
             if (unavailableMembers.Length > 0)
             {
                 ImGui.TextColored(new Vector4(1f, 0.4f, 0.3f, 1f),
-                    $"未捕获或不可用：{string.Join(", ", unavailableMembers.Select(number => number.ToString("00")))}");
+                    $"Not captured or unavailable: {string.Join(", ", unavailableMembers.Select(number => number.ToString("00")))}");
             }
         }
 
@@ -2549,21 +2549,21 @@ public sealed class PluginUI
     private void DrawCurrentPetParty(BeastmasterPartyPreset preset)
     {
         var snapshot = petPartyService.Snapshot;
-        ImGui.Text("当前游戏编队");
+        ImGui.Text("Current In-Game Formation");
         if (!snapshot.Available)
         {
             ImGui.TextDisabled(snapshot.Reason);
             return;
         }
 
-        ImGui.TextDisabled($"当前编队：{snapshot.MemberCount}/{snapshot.Capacity}");
+        ImGui.TextDisabled($"Current Formation: {snapshot.MemberCount}/{snapshot.Capacity}");
         var maximum = Math.Max(snapshot.Members.Count, preset.Members.Count);
         for (var index = 0; index < maximum; index++)
         {
             var current = index < snapshot.Members.Count ? snapshot.Members[index].CatalogNumber : 0;
             var expected = index < preset.Members.Count ? preset.Members[index] : 0;
-            var currentText = current == 0 ? "空" : $"{current:00} {BeastmasterCatalog.Entries[current - 1].Name}";
-            var expectedText = expected == 0 ? "空" : $"{expected:00} {BeastmasterCatalog.Entries[expected - 1].Name}";
+            var currentText = current == 0 ? "Empty" : $"{current:00} {BeastmasterCatalog.Entries[current - 1].Name}";
+            var expectedText = expected == 0 ? "Empty" : $"{expected:00} {BeastmasterCatalog.Entries[expected - 1].Name}";
             var matches = current == expected;
             ImGui.TextColored(matches
                     ? new Vector4(0.45f, 0.8f, 0.5f, 1f)
@@ -2581,14 +2581,14 @@ public sealed class PluginUI
             {
                 preset.Members.RemoveRange(position, preset.Members.Count - position);
             }
-            partyPresetStatus = "已清空该位置及其后的成员。";
+            partyPresetStatus = "Cleared this slot and all following members.";
             configuration.Save();
             return;
         }
 
         if (preset.Members.Contains(number))
         {
-            partyPresetStatus = $"图鉴 {number:00} 已在当前预设中，不能重复添加。";
+            partyPresetStatus = $"Catalog #{number:00} is already in this preset and can't be added again.";
             return;
         }
 
@@ -2602,11 +2602,11 @@ public sealed class PluginUI
         }
         else
         {
-            partyPresetStatus = "请先填写前一个位置，空位只能位于名单末尾。";
+            partyPresetStatus = "Please fill in the previous slot first — empty slots can only be at the end of the list.";
             return;
         }
 
-        partyPresetStatus = "预设已保存。";
+        partyPresetStatus = "Preset saved.";
         configuration.Save();
     }
 
@@ -2630,9 +2630,9 @@ public sealed class PluginUI
         {
             BeastmasterCatalogLocationType.Field when entry.MapX.HasValue && entry.MapY.HasValue
                 => $"X:{entry.MapX:0.#}, Y:{entry.MapY:0.#}",
-            BeastmasterCatalogLocationType.Duty => "副本",
-            BeastmasterCatalogLocationType.Starting => "初始",
-            _ => "未知",
+            BeastmasterCatalogLocationType.Duty => "Duty",
+            BeastmasterCatalogLocationType.Starting => "Default",
+            _ => "Unknown",
         };
 
     private static int GetCatalogMinimumLevel(string level)
@@ -2644,10 +2644,10 @@ public sealed class PluginUI
     private static Vector4 GetAttributeColor(BeastmasterAttribute attribute)
         => attribute switch
         {
-            BeastmasterAttribute.猛 => new Vector4(0.95f, 0.35f, 0.3f, 1f),
-            BeastmasterAttribute.坚 => new Vector4(0.35f, 0.65f, 1f, 1f),
-            BeastmasterAttribute.魔 => new Vector4(1f, 0.82f, 0.25f, 1f),
-            BeastmasterAttribute.翔 => new Vector4(0.4f, 0.9f, 0.5f, 1f),
+            BeastmasterAttribute.Ferocity => new Vector4(0.95f, 0.35f, 0.3f, 1f),
+            BeastmasterAttribute.Fortitude => new Vector4(0.35f, 0.65f, 1f, 1f),
+            BeastmasterAttribute.Magic => new Vector4(1f, 0.82f, 0.25f, 1f),
+            BeastmasterAttribute.Flight => new Vector4(0.4f, 0.9f, 0.5f, 1f),
             _ => new Vector4(0.6f, 0.6f, 0.6f, 1f),
         };
 
@@ -2661,100 +2661,100 @@ public sealed class PluginUI
         var actions = DalamudApi.DataManager.GetExcelSheet<Lumina.Excel.Sheets.Action>();
         if (!actions.TryGetRow(actionId, out var action))
         {
-            ImGui.TextDisabled($"{type}：ActionId {actionId} 未找到");
+            ImGui.TextDisabled($"{type}: ActionId {actionId} not found");
             return;
         }
 
         ImGui.Text($"{type}：{action.Name.ExtractText()}");
-        ImGui.TextDisabled($"ActionId：{actionId} · 等级：{action.ClassJobLevel} · 射程：{action.Range} · 范围：{action.EffectRange}");
+        ImGui.TextDisabled($"ActionId: {actionId} · Level: {action.ClassJobLevel} · Range: {action.Range} · Radius: {action.EffectRange}");
     }
 
     private void DrawSettings()
     {
-        ImGui.Text("设置");
+        ImGui.Text("Settings");
         ImGui.Separator();
 
-        ImGui.Text("依赖插件");
-        DrawDependency("vnavmesh", navigationService.IsVnavmeshInstalled, "同地图路径规划与移动");
-        DrawDependency("Lifestream", navigationService.IsLifestreamInstalled, "跨地图传送");
+        ImGui.Text("Dependency Plugins");
+        DrawDependency("vnavmesh", navigationService.IsVnavmeshInstalled, "Same-map pathfinding and movement");
+        DrawDependency("Lifestream", navigationService.IsLifestreamInstalled, "Cross-map teleport");
         ImGui.Spacing();
 
-        ImGui.Text("常用设置");
-        ImGui.TextDisabled($"当前角色：{progressService.CurrentCharacterLabel}");
-        DrawSettingCheckbox("隐藏已完成任务", "任务页只显示未完成的驯兽师任务。", nameof(configuration.HideCompletedQuests), configuration.HideCompletedQuests);
-        DrawSettingCheckbox("捕获消息自动记录", "收到成功结识消息时自动标记图鉴完成。", nameof(configuration.AutoCompleteCatalogFromChat), configuration.AutoCompleteCatalogFromChat);
+        ImGui.Text("General Settings");
+        ImGui.TextDisabled($"Current Character: {progressService.CurrentCharacterLabel}");
+        DrawSettingCheckbox("Hide Completed Quests", "The Quests tab only shows incomplete Beastmaster quests.", nameof(configuration.HideCompletedQuests), configuration.HideCompletedQuests);
+        DrawSettingCheckbox("Auto-Record on Capture Message", "Automatically marks the catalog entry as complete when you receive a successful capture message.", nameof(configuration.AutoCompleteCatalogFromChat), configuration.AutoCompleteCatalogFromChat);
         ImGui.Spacing();
 
-        ImGui.Text("导航设置");
-        DrawSettingCheckbox("飞行导航", "允许 vnavmesh 使用飞行路径。", nameof(configuration.UseFlightNavigation), configuration.UseFlightNavigation);
-        DrawSettingCheckbox("设置地图标记", "点击导航时同步设置游戏地图 Flag。", nameof(configuration.SetFlagOnNavigation), configuration.SetFlagOnNavigation);
-        DrawSettingCheckbox("显示导航日志", "在聊天栏显示导航开始和失败信息。", nameof(configuration.ShowNavigationLogs), configuration.ShowNavigationLogs);
+        ImGui.Text("Navigation Settings");
+        DrawSettingCheckbox("Flight Navigation", "Allows vnavmesh to use flight paths.", nameof(configuration.UseFlightNavigation), configuration.UseFlightNavigation);
+        DrawSettingCheckbox("Set Map Marker", "Also sets the in-game map flag when you click navigate.", nameof(configuration.SetFlagOnNavigation), configuration.SetFlagOnNavigation);
+        DrawSettingCheckbox("Show Navigation Log", "Shows navigation start and failure messages in the chat log.", nameof(configuration.ShowNavigationLogs), configuration.ShowNavigationLogs);
     }
 
     private void DrawAutoOutput()
     {
-        ImGui.Text("自动输出");
-        ImGui.TextDisabled("配置自动捕获和自动攻击行为。");
+        ImGui.Text("Auto Rotation");
+        ImGui.TextDisabled("Configure auto-capture and auto-attack behavior.");
         ImGui.Separator();
 
         var enabled = autoCaptureService.IsEnabled;
         ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1f, 0.82f, 0.25f, 1f));
-        if (ImGui.Checkbox("自动输出", ref enabled))
+        if (ImGui.Checkbox("Auto Rotation", ref enabled))
         {
             autoCaptureService.SetEnabled(enabled);
         }
         ImGui.PopStyleColor();
         var paused = autoCaptureService.IsPaused;
-        if (ImGui.Checkbox("暂停", ref paused))
+        if (ImGui.Checkbox("Pause", ref paused))
         {
             autoCaptureService.SetPaused(paused);
         }
         ImGui.SameLine();
-        ImGui.TextDisabled("暂停时保留自动输出总开关，但不执行任何动作");
-        ImGui.TextDisabled("仅对当前手动选择的敌对目标生效；无捕获状态时优先捕获，再执行 1→2→3 连击。");
+        ImGui.TextDisabled("While paused, the Auto Rotation master switch stays on, but no actions are executed");
+        ImGui.TextDisabled("Only applies to your currently manually-selected enemy target; if the capture buff is missing, Capture takes priority, then the 1→2→3 combo is used.");
         var activeAttack = autoCaptureService.ActiveAttack;
-        if (ImGui.Checkbox("主动攻击", ref activeAttack))
+        if (ImGui.Checkbox("Active Attack", ref activeAttack))
         {
             autoCaptureService.SetActiveAttack(activeAttack);
         }
         ImGui.SameLine();
-        ImGui.TextDisabled("关闭后，未进战时不攻击、捕获或使用斗兽塔技能");
+        ImGui.TextDisabled("When off, won't attack, capture, or use Beast Arena skills while not in combat");
         var forceCapture = autoCaptureService.ForceCapture;
-        if (ImGui.Checkbox("强制捕获", ref forceCapture))
+        if (ImGui.Checkbox("Force Capture", ref forceCapture))
         {
             autoCaptureService.SetForceCapture(forceCapture);
         }
         ImGui.SameLine();
-        ImGui.TextDisabled("尝试捕获开启时，无视目标捕获BUFF，但仍受血量阈值限制");
+        ImGui.TextDisabled("When Try Capture is on, ignores the target's capture buff but still respects the HP threshold");
         DrawCaptureHpThreshold();
         DrawSettingCheckbox(
-            "详细模式",
-            "显示悬浮窗中的原因、捕获状态、当前魔兽、量谱和高级技能候选等详细信息。默认关闭。",
+            "Verbose Mode",
+            "Shows extra details in the overlay: reasons, capture state, current beast, gauges, and advanced skill candidates. Off by default.",
             nameof(configuration.ShowGaugeInOverlay),
             configuration.ShowGaugeInOverlay);
         DrawAutoOutputDiagnosticsSettings();
         DrawSettingCheckbox(
-            "悬浮窗三列模式",
-            "将悬浮窗高级技能按钮排列为三列。默认关闭。",
+            "3-Column Overlay Layout",
+            "Arranges the overlay's advanced skill buttons into three columns. Off by default.",
             nameof(configuration.OverlayThreeColumnMode),
             configuration.OverlayThreeColumnMode);
         ImGui.Spacing();
         DrawAdvancedActionToggles();
-        ImGui.TextDisabled("优先级：技能序列 → 恢复药 → 规则模式 → 协作二段 → 释放 → 最后一击 → 鼓劲 → 声援 → 万象流转 → 协作一段 → 安全盾牌 → 捕获 → 基础技能");
+        ImGui.TextDisabled("Priority: Skill Sequence → Recovery Item → Rule Mode → Link (2nd Hit) → Release → Finishing Blow → Rally → Cheer → Convergence → Link (1st Hit) → Safety Shield → Capture → Basic Combo");
 
         ImGui.Spacing();
         DrawSequenceSettings();
 
         ImGui.Spacing();
-        ImGui.Text("当前模式");
+        ImGui.Text("Current Mode");
         ImGui.Text(autoCaptureService.IsEnabled
             ? autoCaptureService.IsPaused
-                ? "已暂停"
+                ? "Paused"
                 : autoCaptureService.ForceCapture
-                    ? "强制捕获中..."
-                    : autoCaptureService.TryCapture ? "自动捕获中..." : "自动攻击中..."
-            : "未开启");
-        ImGui.TextDisabled("开启后可在悬浮窗中切换“尝试捕获”，右键悬浮窗可打开设置。");
+                    ? "Force Capturing..."
+                    : autoCaptureService.TryCapture ? "Auto Capturing..." : "Auto Attacking..."
+            : "Off");
+        ImGui.TextDisabled("Once enabled, you can toggle "Try Capture" from the overlay; right-click the overlay to open Settings.");
 
         ImGui.Spacing();
         DrawBeastmasterGauge();
@@ -2763,43 +2763,43 @@ public sealed class PluginUI
 
     private void DrawAutoOutputDiagnosticsSettings()
     {
-        if (!ImGui.CollapsingHeader("自动输出诊断##AutoOutputDiagnostics"))
+        if (!ImGui.CollapsingHeader("Auto Rotation Diagnostics##AutoOutputDiagnostics"))
         {
             return;
         }
 
         ImGui.Indent();
         DrawSettingCheckbox(
-            "启用自动输出诊断",
-            "所有诊断模块的状态或原因发生变化时输出一次汇总，并记录到战斗日志。",
+            "Enable Auto Rotation Diagnostics",
+            "Logs a summary whenever any diagnostic module's status or reason changes, and records it to the Combat Log.",
             nameof(configuration.AutoOutputDiagnosticsEnabled),
             configuration.AutoOutputDiagnosticsEnabled);
         ImGui.Spacing();
-        if (ImGui.Button("复制所选战斗日志"))
+        if (ImGui.Button("Copy Selected Combat Log"))
         {
             ImGui.SetClipboardText(autoCaptureService.GetBattleLog(selectedBattleLogIndex));
         }
         ImGui.SameLine();
-        if (ImGui.Button("清空战斗日志")) autoCaptureService.ClearBattleLogs();
+        if (ImGui.Button("Clear Combat Log")) autoCaptureService.ClearBattleLogs();
         var battleLogs = autoCaptureService.BattleLogLabels;
         if (battleLogs.Count > 0)
         {
             selectedBattleLogIndex = Math.Clamp(selectedBattleLogIndex, 0, battleLogs.Count - 1);
             var labels = string.Join('\0', battleLogs) + '\0';
             ImGui.SetNextItemWidth(260f);
-            ImGui.Combo("战斗日志", ref selectedBattleLogIndex, labels);
+            ImGui.Combo("Combat Log", ref selectedBattleLogIndex, labels);
         }
         else
         {
             selectedBattleLogIndex = 0;
-            ImGui.TextDisabled("暂无战斗日志");
+            ImGui.TextDisabled("No combat log yet");
         }
         ImGui.Unindent();
     }
 
     private void DrawAdvancedActionToggles(bool compactFinalStrike = false)
     {
-        if (!compactFinalStrike && !ImGui.CollapsingHeader("高级技能##BeastmasterAdvancedActions"))
+        if (!compactFinalStrike && !ImGui.CollapsingHeader("Advanced Skills##BeastmasterAdvancedActions"))
         {
             return;
         }
@@ -2810,94 +2810,94 @@ public sealed class PluginUI
             if (configuration.OverlayThreeColumnMode)
             {
                 var threeColumn = 0;
-                DrawOverlayAdvancedToggle("御兽协作", configuration.BeastHeartCooperationEnabled, () => ToggleCooperation(true), "御兽协作（黄豆）", ref threeColumn, columnCount: 3);
-                DrawOverlayAdvancedToggle("兽灵协作", configuration.BeastSoulCooperationEnabled, () => ToggleCooperation(false), "兽灵协作（蓝豆）", ref threeColumn, columnCount: 3);
-                DrawOverlayAdvancedToggle("鼓劲", configuration.AutoDrumEnabled, () => ToggleBoolean(nameof(configuration.AutoDrumEnabled)), "鼓劲 · 好了就放", ref threeColumn, columnCount: 3);
-                DrawOverlayAdvancedToggle("万象·物理", configuration.PhysicalThirdFormEnabled, () => ToggleThirdForm(true), "万象流转（物理）", ref threeColumn, columnCount: 3);
-                DrawOverlayAdvancedToggle("万象·魔法", configuration.MagicalThirdFormEnabled, () => ToggleThirdForm(false), "万象流转（魔法）", ref threeColumn, columnCount: 3);
-                DrawOverlayAdvancedToggle("声援", configuration.AutoCheerEnabled, () => ToggleBoolean(nameof(configuration.AutoCheerEnabled)), "声援 · 好了就放", ref threeColumn, columnCount: 3);
-                DrawOverlayAdvancedToggle("自动兽笛", configuration.AutoWhistleEnabled, () => ToggleBoolean(nameof(configuration.AutoWhistleEnabled)), "自动兽笛", ref threeColumn, columnCount: 3);
-                DrawOverlayAdvancedToggle("最后一击", configuration.AutoFinalStrikeEnabled, () => autoCaptureService.SetFinalStrikeEnabled(!configuration.AutoFinalStrikeEnabled), "最后一击", ref threeColumn, columnCount: 3);
-                DrawOverlayAdvancedToggle("释放", configuration.AutoReleaseEnabled, () => ToggleBoolean(nameof(configuration.AutoReleaseEnabled)), "释放 · 好了就放", ref threeColumn, columnCount: 3);
-                DrawOverlayAdvancedToggle("持续吸引", IsArenaRuleEnabled(46751, 2413), () => ToggleArenaRule(46751, 2413), "持续吸引", ref threeColumn, columnCount: 3, yellowWhenEnabled: true);
-                DrawOverlayAdvancedToggle("持续挑衅", IsArenaRuleEnabled(46750, 5586), () => ToggleArenaRule(46750, 5586), "持续挑衅", ref threeColumn, columnCount: 3, yellowWhenEnabled: true);
-                DrawOverlayAdvancedToggle("安全盾牌", configuration.AutoSafeShieldEnabled, () => ToggleBoolean(nameof(configuration.AutoSafeShieldEnabled)), "安全盾牌：玩家到目标不超过 3 yalms 且盾牌冲击可用时自动使用。", ref threeColumn, columnCount: 3, yellowWhenEnabled: true);
+                DrawOverlayAdvancedToggle("Taming Link", configuration.BeastHeartCooperationEnabled, () => ToggleCooperation(true), "Taming Link (Yellow Orb)", ref threeColumn, columnCount: 3);
+                DrawOverlayAdvancedToggle("Beast Spirit Link", configuration.BeastSoulCooperationEnabled, () => ToggleCooperation(false), "Beast Spirit Link (Blue Orb)", ref threeColumn, columnCount: 3);
+                DrawOverlayAdvancedToggle("Rally", configuration.AutoDrumEnabled, () => ToggleBoolean(nameof(configuration.AutoDrumEnabled)), "Rally · Auto-Use When Ready", ref threeColumn, columnCount: 3);
+                DrawOverlayAdvancedToggle("Convergence · Physical", configuration.PhysicalThirdFormEnabled, () => ToggleThirdForm(true), "Convergence (Physical)", ref threeColumn, columnCount: 3);
+                DrawOverlayAdvancedToggle("Convergence · Magic", configuration.MagicalThirdFormEnabled, () => ToggleThirdForm(false), "Convergence (Magic)", ref threeColumn, columnCount: 3);
+                DrawOverlayAdvancedToggle("Cheer", configuration.AutoCheerEnabled, () => ToggleBoolean(nameof(configuration.AutoCheerEnabled)), "Cheer · Auto-Use When Ready", ref threeColumn, columnCount: 3);
+                DrawOverlayAdvancedToggle("Auto Beast Whistle", configuration.AutoWhistleEnabled, () => ToggleBoolean(nameof(configuration.AutoWhistleEnabled)), "Auto Beast Whistle", ref threeColumn, columnCount: 3);
+                DrawOverlayAdvancedToggle("Finishing Blow", configuration.AutoFinalStrikeEnabled, () => autoCaptureService.SetFinalStrikeEnabled(!configuration.AutoFinalStrikeEnabled), "Finishing Blow", ref threeColumn, columnCount: 3);
+                DrawOverlayAdvancedToggle("Release", configuration.AutoReleaseEnabled, () => ToggleBoolean(nameof(configuration.AutoReleaseEnabled)), "Release · Auto-Use When Ready", ref threeColumn, columnCount: 3);
+                DrawOverlayAdvancedToggle("Sustained Provoke", IsArenaRuleEnabled(46751, 2413), () => ToggleArenaRule(46751, 2413), "Sustained Provoke", ref threeColumn, columnCount: 3, yellowWhenEnabled: true);
+                DrawOverlayAdvancedToggle("Sustained Taunt", IsArenaRuleEnabled(46750, 5586), () => ToggleArenaRule(46750, 5586), "Sustained Taunt", ref threeColumn, columnCount: 3, yellowWhenEnabled: true);
+                DrawOverlayAdvancedToggle("Safety Shield", configuration.AutoSafeShieldEnabled, () => ToggleBoolean(nameof(configuration.AutoSafeShieldEnabled)), "Safety Shield: automatically used when you're within 3 yalms of the target and Shield Bash is available.", ref threeColumn, columnCount: 3, yellowWhenEnabled: true);
                 return;
             }
 
             var column = 0;
-            DrawOverlayAdvancedToggle("御兽协作", configuration.BeastHeartCooperationEnabled,
+            DrawOverlayAdvancedToggle("Taming Link", configuration.BeastHeartCooperationEnabled,
                 () =>
                 {
                     configuration.BeastHeartCooperationEnabled = !configuration.BeastHeartCooperationEnabled;
                     if (configuration.BeastHeartCooperationEnabled) configuration.BeastSoulCooperationEnabled = false;
                     configuration.Save();
-                }, "御兽协作（黄豆）", ref column);
-            DrawOverlayAdvancedToggle("兽灵协作", configuration.BeastSoulCooperationEnabled,
+                }, "Taming Link (Yellow Orb)", ref column);
+            DrawOverlayAdvancedToggle("Beast Spirit Link", configuration.BeastSoulCooperationEnabled,
                 () =>
                 {
                     configuration.BeastSoulCooperationEnabled = !configuration.BeastSoulCooperationEnabled;
                     if (configuration.BeastSoulCooperationEnabled) configuration.BeastHeartCooperationEnabled = false;
                     configuration.Save();
-                }, "兽灵协作（蓝豆）", ref column);
-            DrawOverlayAdvancedToggle("万象·物理", configuration.PhysicalThirdFormEnabled,
+                }, "Beast Spirit Link (Blue Orb)", ref column);
+            DrawOverlayAdvancedToggle("Convergence · Physical", configuration.PhysicalThirdFormEnabled,
                 () =>
                 {
                     configuration.PhysicalThirdFormEnabled = !configuration.PhysicalThirdFormEnabled;
                     if (configuration.PhysicalThirdFormEnabled) configuration.MagicalThirdFormEnabled = false;
                     configuration.Save();
-                }, "万象流转（物理）", ref column);
-            DrawOverlayAdvancedToggle("万象·魔法", configuration.MagicalThirdFormEnabled,
+                }, "Convergence (Physical)", ref column);
+            DrawOverlayAdvancedToggle("Convergence · Magic", configuration.MagicalThirdFormEnabled,
                 () =>
                 {
                     configuration.MagicalThirdFormEnabled = !configuration.MagicalThirdFormEnabled;
                     if (configuration.MagicalThirdFormEnabled) configuration.PhysicalThirdFormEnabled = false;
                     configuration.Save();
-                }, "万象流转（魔法）", ref column);
-            DrawOverlayAdvancedToggle("鼓劲", configuration.AutoDrumEnabled,
+                }, "Convergence (Magic)", ref column);
+            DrawOverlayAdvancedToggle("Rally", configuration.AutoDrumEnabled,
                 () =>
                 {
                     configuration.AutoDrumEnabled = !configuration.AutoDrumEnabled;
                     configuration.Save();
-                }, "鼓劲 · 好了就放：御兽之心为 0 时正常判断；御兽之心大于 0 时，只有开启万象流转（物理或魔法）才继续判断。技能系统允许时自动使用鼓劲（44905）。", ref column);
-            DrawOverlayAdvancedToggle("声援", configuration.AutoCheerEnabled,
+                }, "Rally · Auto-Use When Ready: evaluated normally when Heart of Taming is 0; when Heart of Taming is above 0, it's only evaluated if Convergence (Physical or Magic) is enabled. Automatically uses Rally (44905) whenever the game allows it.", ref column);
+            DrawOverlayAdvancedToggle("Cheer", configuration.AutoCheerEnabled,
                 () =>
                 {
                     configuration.AutoCheerEnabled = !configuration.AutoCheerEnabled;
                     configuration.Save();
-                }, "声援 · 好了就放：兽灵之心为 0 时正常判断；兽灵之心大于 0 时，只有开启万象流转（物理或魔法）才继续判断。技能系统允许时自动使用声援（44904）。", ref column);
-            DrawOverlayAdvancedToggle("自动兽笛", configuration.AutoWhistleEnabled,
+                }, "Cheer · Auto-Use When Ready: evaluated normally when Heart of the Beast Spirit is 0; when it's above 0, it's only evaluated if Convergence (Physical or Magic) is enabled. Automatically uses Cheer (44904) whenever the game allows it.", ref column);
+            DrawOverlayAdvancedToggle("Auto Beast Whistle", configuration.AutoWhistleEnabled,
                 () =>
                 {
                     configuration.AutoWhistleEnabled = !configuration.AutoWhistleEnabled;
                     configuration.Save();
-                }, "当前没有魔兽时，按兽笛 1→2→3 使用首个可用技能；请求后等待 1 秒确认召唤，避免连续误用下一支兽笛。", ref column);
-            DrawOverlayAdvancedToggle("安全盾牌", configuration.AutoSafeShieldEnabled, () => ToggleBoolean(nameof(configuration.AutoSafeShieldEnabled)), "安全盾牌：玩家到目标不超过 3 yalms 且盾牌冲击可用时自动使用。", ref column, yellowWhenEnabled: true);
-            DrawOverlayAdvancedToggle("释放", configuration.AutoReleaseEnabled,
+                }, "When no beast is out, cycles Whistle 1→2→3 to use the first available one; waits 1 second after requesting a summon to confirm before trying the next whistle, avoiding accidental double-uses.", ref column);
+            DrawOverlayAdvancedToggle("Safety Shield", configuration.AutoSafeShieldEnabled, () => ToggleBoolean(nameof(configuration.AutoSafeShieldEnabled)), "Safety Shield: automatically used when you're within 3 yalms of the target and Shield Bash is available.", ref column, yellowWhenEnabled: true);
+            DrawOverlayAdvancedToggle("Release", configuration.AutoReleaseEnabled,
                 () =>
                 {
                     configuration.AutoReleaseEnabled = !configuration.AutoReleaseEnabled;
                     configuration.Save();
-                }, "释放 · 好了就放：技能系统允许且召唤兽进入释放距离时自动使用释放。", ref column);
-            DrawOverlayAdvancedToggle("最后一击", configuration.AutoFinalStrikeEnabled,
+                }, "Release · Auto-Use When Ready: automatically uses Release when the game allows it and the summoned beast is within Release range.", ref column);
+            DrawOverlayAdvancedToggle("Finishing Blow", configuration.AutoFinalStrikeEnabled,
                 () => autoCaptureService.SetFinalStrikeEnabled(!configuration.AutoFinalStrikeEnabled),
-                "最后一击总开关。1、2、3 笛独立开关和宝宝血量阈值请在自动输出页面设置；开启“等待释放”时，会等待当前魔兽先使用释放。",
+                "Master switch for Finishing Blow. Set individual toggles for Whistles 1/2/3 and the pet HP threshold in the Auto Rotation tab; when "Wait for Release" is on, it waits for the current beast to use Release first.",
                 ref column);
-            DrawOverlayAdvancedToggle("持续吸引", IsArenaRuleEnabled(46751, 2413),
+            DrawOverlayAdvancedToggle("Sustained Provoke", IsArenaRuleEnabled(46751, 2413),
                 () => ToggleArenaRule(46751, 2413),
-                "切换规则模式内的持续吸引规则，仅在斗兽塔区域 1339~1343 生效。",
+                "Toggles the Sustained Provoke rule in Rule Mode; only effective in Beast Arena zones 1339-1343.",
                 ref column,
                 yellowWhenEnabled: true);
-            DrawOverlayAdvancedToggle("持续挑衅", IsArenaRuleEnabled(46750, 5586),
+            DrawOverlayAdvancedToggle("Sustained Taunt", IsArenaRuleEnabled(46750, 5586),
                 () => ToggleArenaRule(46750, 5586),
-                "切换规则模式内的持续挑衅规则，仅在斗兽塔区域 1339~1343 生效。",
+                "Toggles the Sustained Taunt rule in Rule Mode; only effective in Beast Arena zones 1339-1343.",
                 ref column,
                 yellowWhenEnabled: true);
             return;
         }
 
         var beastHeartEnabled = configuration.BeastHeartCooperationEnabled;
-        if (ImGui.Checkbox("御兽协作（黄豆）", ref beastHeartEnabled))
+        if (ImGui.Checkbox("Taming Link (Yellow Orb)", ref beastHeartEnabled))
         {
             configuration.BeastHeartCooperationEnabled = beastHeartEnabled;
             if (beastHeartEnabled)
@@ -2908,7 +2908,7 @@ public sealed class PluginUI
         }
 
         var beastSoulEnabled = configuration.BeastSoulCooperationEnabled;
-        if (ImGui.Checkbox("兽灵协作（蓝豆）", ref beastSoulEnabled))
+        if (ImGui.Checkbox("Beast Spirit Link (Blue Orb)", ref beastSoulEnabled))
         {
             configuration.BeastSoulCooperationEnabled = beastSoulEnabled;
             if (beastSoulEnabled)
@@ -2919,7 +2919,7 @@ public sealed class PluginUI
         }
 
         var physicalThirdFormEnabled = configuration.PhysicalThirdFormEnabled;
-        if (ImGui.Checkbox("万象流转（物理）", ref physicalThirdFormEnabled))
+        if (ImGui.Checkbox("Convergence (Physical)", ref physicalThirdFormEnabled))
         {
             configuration.PhysicalThirdFormEnabled = physicalThirdFormEnabled;
             if (physicalThirdFormEnabled)
@@ -2930,11 +2930,11 @@ public sealed class PluginUI
         }
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip("万象流转·物理");
+            ImGui.SetTooltip("Convergence · Physical");
         }
 
         var magicalThirdFormEnabled = configuration.MagicalThirdFormEnabled;
-        if (ImGui.Checkbox("万象流转（魔法）", ref magicalThirdFormEnabled))
+        if (ImGui.Checkbox("Convergence (Magic)", ref magicalThirdFormEnabled))
         {
             configuration.MagicalThirdFormEnabled = magicalThirdFormEnabled;
             if (magicalThirdFormEnabled)
@@ -2945,47 +2945,47 @@ public sealed class PluginUI
         }
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip("万象流转·魔法");
+            ImGui.SetTooltip("Convergence · Magic");
         }
 
         var autoWhistleEnabled = configuration.AutoWhistleEnabled;
-        if (ImGui.Checkbox("自动兽笛", ref autoWhistleEnabled))
+        if (ImGui.Checkbox("Auto Beast Whistle", ref autoWhistleEnabled))
         {
             configuration.AutoWhistleEnabled = autoWhistleEnabled;
             configuration.Save();
         }
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip("当前没有魔兽时，按兽笛 1→2→3 使用首个可用技能；释放后等待 1 秒确认召唤。");
+            ImGui.SetTooltip("When no beast is out, cycles Whistle 1→2→3 to use the first available one; waits 1 second after use to confirm the summon.");
         }
 
-        DrawCompactSettingCheckbox("鼓劲", "鼓劲 · 好了就放：御兽之心为 0 时判断；御兽之心为 3 且技力为 0 时也判断。技能系统允许时自动使用鼓劲（44905）。", nameof(configuration.AutoDrumEnabled), configuration.AutoDrumEnabled);
-        DrawCompactSettingCheckbox("声援", "声援 · 好了就放：兽灵之心为 0 时判断；兽灵之心为 3 且兽力为 0 时也判断。技能系统允许时自动使用声援（44904）。", nameof(configuration.AutoCheerEnabled), configuration.AutoCheerEnabled);
-        DrawCompactSettingCheckbox("借用", "借用 · 好了就放：借用当前魔兽的本能技能（44895），借用后魔兽技变为借用技能。默认关闭，暂不参与自动输出。", nameof(configuration.AutoBorrowEnabled), configuration.AutoBorrowEnabled);
-        DrawCompactSettingCheckbox("魔兽技", "魔兽技 · 好了就放：释放借用后的本能技能（44886 调整后）。默认关闭，暂不参与自动输出。", nameof(configuration.AutoBeastSkillEnabled), configuration.AutoBeastSkillEnabled);
+        DrawCompactSettingCheckbox("Rally", "Rally · Auto-Use When Ready: evaluated when Heart of Taming is 0, and also when Heart of Taming is 3 and Skill Power is 0. Automatically uses Rally (44905) whenever the game allows it.", nameof(configuration.AutoDrumEnabled), configuration.AutoDrumEnabled);
+        DrawCompactSettingCheckbox("Cheer", "Cheer · Auto-Use When Ready: evaluated when Heart of the Beast Spirit is 0, and also when it's 3 and Beast Power is 0. Automatically uses Cheer (44904) whenever the game allows it.", nameof(configuration.AutoCheerEnabled), configuration.AutoCheerEnabled);
+        DrawCompactSettingCheckbox("Borrow", "Borrow · Auto-Use When Ready: borrows the current beast's Instinct skill (44895); after borrowing, Beast Skill becomes the borrowed skill. Off by default and not currently part of Auto Rotation.", nameof(configuration.AutoBorrowEnabled), configuration.AutoBorrowEnabled);
+        DrawCompactSettingCheckbox("Beast Skill", "Beast Skill · Auto-Use When Ready: uses the borrowed Instinct skill (adjusted 44886). Off by default and not currently part of Auto Rotation.", nameof(configuration.AutoBeastSkillEnabled), configuration.AutoBeastSkillEnabled);
 
         var autoRecoveryItemEnabled = configuration.AutoRecoveryItemEnabled;
-        if (ImGui.Checkbox("低血量自动使用恢复药", ref autoRecoveryItemEnabled))
+        if (ImGui.Checkbox("Auto-Use Recovery Item at Low HP", ref autoRecoveryItemEnabled))
         {
             configuration.AutoRecoveryItemEnabled = autoRecoveryItemEnabled;
             configuration.Save();
         }
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip("仅在斗兽奇弈战斗中生效；自身血量低于阈值时按恢复药套装 → 4/3/2/1级恢复药 → 3/2/1级药粉 → 魔兽吸血药 → 吸血鬼之牙优先级使用奇弈恢复道具。吸血鬼之牙需要当前敌对目标，成功使用后间隔 2 秒。默认关闭。");
+            ImGui.SetTooltip("Only effective in Beast Arena Trials fights; when your HP drops below the threshold, uses Trial recovery items in this priority: Recovery Set → Recovery Potion Lv4/3/2/1 → Recovery Powder Lv3/2/1 → Beast Vigor Potion → Vampire Fang. Vampire Fang requires a current enemy target and has a 2-second cooldown after a successful use. Off by default.");
         }
         if (configuration.AutoRecoveryItemEnabled)
         {
             ImGui.SetNextItemWidth(70f);
             var recoveryThreshold = configuration.AutoRecoveryItemHpThreshold;
-            if (ImGui.InputFloat("恢复药血量阈值", ref recoveryThreshold, 0f, 0f, "%.0f%%"))
+            if (ImGui.InputFloat("Recovery Item HP Threshold", ref recoveryThreshold, 0f, 0f, "%.0f%%"))
             {
                 configuration.AutoRecoveryItemHpThreshold = Math.Clamp(recoveryThreshold, 1f, 100f);
                 configuration.Save();
             }
             DrawCompactSettingCheckbox(
-                "恢复药默语提示",
-                "低血量自动吃药成功或失败时发送默语提示；成功以请求后自身血量上升为准。默认关闭。",
+                "Recovery Item Silent Chat Alert",
+                "Sends a silent-chat alert when an automatic low-HP item use succeeds or fails; success is determined by an HP increase after the request. Off by default.",
                 nameof(configuration.AutoRecoveryItemDiagnosticsEnabled),
                 configuration.AutoRecoveryItemDiagnosticsEnabled);
         }
@@ -2993,70 +2993,70 @@ public sealed class PluginUI
         if (compactFinalStrike)
         {
             var finalStrikeEnabled = autoCaptureService.FinalStrikeEnabled;
-            if (ImGui.Checkbox("最后一击", ref finalStrikeEnabled))
+            if (ImGui.Checkbox("Finishing Blow", ref finalStrikeEnabled))
             {
                 autoCaptureService.SetFinalStrikeEnabled(finalStrikeEnabled);
             }
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip("1、2、3 笛的血量设置在自动输出栏目 - 高级技能中。");
+                ImGui.SetTooltip("HP settings for Whistles 1, 2, and 3 are in the Auto Rotation tab under Advanced Skills.");
             }
         }
         else
         {
-            DrawFinalStrikeSettings("1 笛", nameof(configuration.AutoFinalStrikeWhistleOneEnabled), configuration.AutoFinalStrikeWhistleOneEnabled,
+            DrawFinalStrikeSettings("Whistle 1", nameof(configuration.AutoFinalStrikeWhistleOneEnabled), configuration.AutoFinalStrikeWhistleOneEnabled,
                 nameof(configuration.AutoFinalStrikeWhistleOneHpThreshold), configuration.AutoFinalStrikeWhistleOneHpThreshold);
-            DrawFinalStrikeSettings("2 笛", nameof(configuration.AutoFinalStrikeWhistleTwoEnabled), configuration.AutoFinalStrikeWhistleTwoEnabled,
+            DrawFinalStrikeSettings("Whistle 2", nameof(configuration.AutoFinalStrikeWhistleTwoEnabled), configuration.AutoFinalStrikeWhistleTwoEnabled,
                 nameof(configuration.AutoFinalStrikeWhistleTwoHpThreshold), configuration.AutoFinalStrikeWhistleTwoHpThreshold);
-            DrawFinalStrikeSettings("3 笛", nameof(configuration.AutoFinalStrikeWhistleThreeEnabled), configuration.AutoFinalStrikeWhistleThreeEnabled,
+            DrawFinalStrikeSettings("Whistle 3", nameof(configuration.AutoFinalStrikeWhistleThreeEnabled), configuration.AutoFinalStrikeWhistleThreeEnabled,
                 nameof(configuration.AutoFinalStrikeWhistleThreeHpThreshold), configuration.AutoFinalStrikeWhistleThreeHpThreshold);
 
             var waitForRelease = configuration.AutoFinalStrikeWaitForRelease;
-            if (ImGui.Checkbox("最后一击 · 等待释放", ref waitForRelease))
+            if (ImGui.Checkbox("Finishing Blow · Wait for Release", ref waitForRelease))
             {
                 configuration.AutoFinalStrikeWaitForRelease = waitForRelease;
                 configuration.Save();
             }
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip("开启后，仅当当前魔兽的释放技能不可用时，才会使用最后一击；不要求开启自动释放。");
+                ImGui.SetTooltip("When enabled, Finishing Blow is only used once the current beast's Release skill is unavailable; Auto Release doesn't need to be on.");
             }
         }
 
         var releaseEnabled = configuration.AutoReleaseEnabled;
-        if (ImGui.Checkbox("释放", ref releaseEnabled))
+        if (ImGui.Checkbox("Release", ref releaseEnabled))
         {
             configuration.AutoReleaseEnabled = releaseEnabled;
             configuration.Save();
         }
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip("释放总开关；1、2、3 笛独立开关和目标血量阈值在下方设置。");
+            ImGui.SetTooltip("Master switch for Release; individual toggles for Whistles 1/2/3 and the target HP threshold are set below.");
         }
         if (!compactFinalStrike)
         {
-            DrawReleaseSettings("1 笛", nameof(configuration.AutoReleaseWhistleOneEnabled), configuration.AutoReleaseWhistleOneEnabled,
+            DrawReleaseSettings("Whistle 1", nameof(configuration.AutoReleaseWhistleOneEnabled), configuration.AutoReleaseWhistleOneEnabled,
                 nameof(configuration.AutoReleaseWhistleOneTargetHpThreshold), configuration.AutoReleaseWhistleOneTargetHpThreshold);
-            DrawReleaseSettings("2 笛", nameof(configuration.AutoReleaseWhistleTwoEnabled), configuration.AutoReleaseWhistleTwoEnabled,
+            DrawReleaseSettings("Whistle 2", nameof(configuration.AutoReleaseWhistleTwoEnabled), configuration.AutoReleaseWhistleTwoEnabled,
                 nameof(configuration.AutoReleaseWhistleTwoTargetHpThreshold), configuration.AutoReleaseWhistleTwoTargetHpThreshold);
-            DrawReleaseSettings("3 笛", nameof(configuration.AutoReleaseWhistleThreeEnabled), configuration.AutoReleaseWhistleThreeEnabled,
+            DrawReleaseSettings("Whistle 3", nameof(configuration.AutoReleaseWhistleThreeEnabled), configuration.AutoReleaseWhistleThreeEnabled,
                 nameof(configuration.AutoReleaseWhistleThreeTargetHpThreshold), configuration.AutoReleaseWhistleThreeTargetHpThreshold);
 
             var releaseBossOnly = configuration.AutoReleaseBossOnly;
-            if (ImGui.Checkbox("释放 · 只打BOSS", ref releaseBossOnly))
+            if (ImGui.Checkbox("Release · Bosses Only", ref releaseBossOnly))
             {
                 configuration.AutoReleaseBossOnly = releaseBossOnly;
                 configuration.Save();
             }
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip("开启后，仅当目标最大 HP 严格大于自身最大 HP × 5 时，当前笛才允许按目标血量阈值使用释放。默认关闭。");
+                ImGui.SetTooltip("When enabled, the current whistle can only use Release based on the target HP threshold when the target's max HP is strictly greater than your max HP × 5. Off by default.");
             }
         }
 
-        // 暂时隐藏兽笛循环连招入口，保留实现以便后续恢复。
+        // Temporarily hide the Whistle Rotation Combo entry point; implementation kept for future restoration.
         // var whistleRotationEnabled = configuration.WhistleRotationEnabled;
-        // if (ImGui.Checkbox("兽笛循环连招", ref whistleRotationEnabled))
+        // if (ImGui.Checkbox("Whistle Rotation Combo", ref whistleRotationEnabled))
         // {
         //     configuration.WhistleRotationEnabled = whistleRotationEnabled;
         //     configuration.Save();
@@ -3064,11 +3064,11 @@ public sealed class PluginUI
         // if (ImGui.IsItemHovered())
         // {
         //     ImGui.BeginTooltip();
-        //     ImGui.TextUnformatted("兽笛1（非战斗）→释放→最后一击→兽笛2→释放→最后一击→兽笛3→释放");
-        //     ImGui.TextDisabled("完成后自动关闭，并等待兽笛1冷却结束。");
+        //     ImGui.TextUnformatted("Whistle 1 (out of combat) → Release → Finishing Blow → Whistle 2 → Release → Finishing Blow → Whistle 3 → Release");
+        //     ImGui.TextDisabled("Automatically turns off when finished and waits for Whistle 1's cooldown to end.");
         //     ImGui.EndTooltip();
         // }
-        // ImGui.TextDisabled($"状态：{autoCaptureService.WhistleRotationStatus}");
+        // ImGui.TextDisabled($"Status: {autoCaptureService.WhistleRotationStatus}");
 
         ImGui.Unindent();
     }
@@ -3186,23 +3186,23 @@ public sealed class PluginUI
 
     private void DrawSequenceSettings()
     {
-        if (!ImGui.CollapsingHeader("技能序列##BeastmasterSequenceSettings"))
+        if (!ImGui.CollapsingHeader("Skill Sequence##BeastmasterSequenceSettings"))
         {
             return;
         }
 
         ImGui.Indent();
         var enabled = sequenceService.Enabled;
-        if (ImGui.Checkbox("启用技能序列", ref enabled))
+        if (ImGui.Checkbox("Enable Skill Sequence", ref enabled))
         {
             sequenceService.SetEnabled(enabled);
         }
-        DrawSequenceSelector("当前序列", "##settings-sequence-selector");
-        ImGui.TextDisabled($"当前序列：{sequenceService.CurrentSequenceName}");
-        ImGui.TextDisabled($"状态：{sequenceService.Status}");
-        if (sequenceService.IsControlling && ImGui.Button("中止技能序列"))
+        DrawSequenceSelector("Current Sequence", "##settings-sequence-selector");
+        ImGui.TextDisabled($"Current Sequence: {sequenceService.CurrentSequenceName}");
+        ImGui.TextDisabled($"Status: {sequenceService.Status}");
+        if (sequenceService.IsControlling && ImGui.Button("Abort Skill Sequence"))
         {
-            sequenceService.Abort("已手动中止，等待下一次团队倒计时");
+            sequenceService.Abort("Manually aborted, waiting for the next party countdown");
         }
         ImGui.Unindent();
     }
@@ -3224,7 +3224,7 @@ public sealed class PluginUI
             configuration.Save();
             if (sequenceService.IsControlling)
             {
-                sequenceService.Abort("已切换序列，等待下一次团队倒计时");
+                sequenceService.Abort("Sequence switched, waiting for the next party countdown");
             }
         }
     }
@@ -3237,7 +3237,7 @@ public sealed class PluginUI
         }
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip($"{label}最后一击；血量阈值请在自动输出栏目设置。");
+            ImGui.SetTooltip($"{label} Finishing Blow; set the HP threshold in the Auto Rotation tab.");
         }
     }
 
@@ -3248,7 +3248,7 @@ public sealed class PluginUI
         string thresholdProperty,
         float threshold)
     {
-        if (ImGui.Checkbox($"最后一击 · {label}##{enabledProperty}", ref enabled))
+        if (ImGui.Checkbox($"Finishing Blow · {label}##{enabledProperty}", ref enabled))
         {
             SetFinalStrikeEnabled(enabledProperty, enabled);
         }
@@ -3261,7 +3261,7 @@ public sealed class PluginUI
         }
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip($"{label}宝宝血量小于等于该阈值时使用最后一击，范围 1%~100%。");
+            ImGui.SetTooltip($"Uses Finishing Blow for {label} when the pet's HP is at or below this threshold, ranging 1%-100%.");
         }
     }
 
@@ -3307,7 +3307,7 @@ public sealed class PluginUI
         string thresholdProperty,
         float threshold)
     {
-        if (ImGui.Checkbox($"释放 · {label}##{enabledProperty}", ref enabled))
+        if (ImGui.Checkbox($"Release · {label}##{enabledProperty}", ref enabled))
         {
             SetReleaseEnabled(enabledProperty, enabled);
         }
@@ -3320,7 +3320,7 @@ public sealed class PluginUI
         }
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip($"目标血量小于等于该阈值时允许 {label}释放，范围 1%~100%。");
+            ImGui.SetTooltip($"Allows {label} to use Release when the target's HP is at or below this threshold, ranging 1%-100%.");
         }
     }
 
@@ -3385,7 +3385,7 @@ public sealed class PluginUI
     {
         var threshold = Math.Clamp(configuration.CaptureHpThreshold, 1f, 100f);
         ImGui.SetNextItemWidth(180f);
-        if (ImGui.InputFloat("捕获血量阈值", ref threshold, 1f, 5f, "%.0f%%"))
+        if (ImGui.InputFloat("Capture HP Threshold", ref threshold, 1f, 5f, "%.0f%%"))
         {
             threshold = Math.Clamp(threshold, 1f, 100f);
             configuration.CaptureHpThreshold = threshold;
@@ -3393,14 +3393,14 @@ public sealed class PluginUI
         }
 
         ImGui.SameLine();
-        ImGui.TextDisabled("目标低于此血量时释放捕获");
+        ImGui.TextDisabled("Uses Capture when the target is below this HP");
     }
 
     private void DrawBeastmasterGauge()
     {
         ImGui.Separator();
-        ImGui.Text("当前量谱");
-        ImGui.TextDisabled("只读显示当前驯兽师量谱状态；数据来自 JobGaugeManager.CurrentGauge。");
+        ImGui.Text("Current Gauge");
+        ImGui.TextDisabled("Read-only display of the current Beastmaster gauge state; data comes from JobGaugeManager.CurrentGauge.");
 
         var snapshot = gaugeSnapshot;
         ImGui.TextColored(
@@ -3421,24 +3421,24 @@ public sealed class PluginUI
                 2,
                 ImGuiTableFlags.BordersInnerH | ImGuiTableFlags.SizingStretchProp))
         {
-            ImGui.TableSetupColumn("字段", ImGuiTableColumnFlags.WidthFixed, 150f);
-            ImGui.TableSetupColumn("当前值", ImGuiTableColumnFlags.WidthStretch);
-            DrawGaugeRow("技力", $"{snapshot.Tp} / {BeastmasterGaugeSnapshot.MaximumGauge}", "基础技能资源");
-            DrawGaugeRow("兽力", $"{snapshot.BeastPower} / {BeastmasterGaugeSnapshot.MaximumGauge}", "兽心技能资源");
-            DrawGaugeRow("当前兽笛", snapshot.WhistleIndex is >= 1 and <= 3
-                ? $"{snapshot.WhistleIndex} 号"
-                : "未召唤", "当前兽笛类型");
-            DrawGaugeRow("宝宝血量", snapshot.SummonMaxHp > 0
+            ImGui.TableSetupColumn("Field", ImGuiTableColumnFlags.WidthFixed, 150f);
+            ImGui.TableSetupColumn("Current Value", ImGuiTableColumnFlags.WidthStretch);
+            DrawGaugeRow("Skill Power", $"{snapshot.Tp} / {BeastmasterGaugeSnapshot.MaximumGauge}", "Basic Skill Resource");
+            DrawGaugeRow("Beast Power", $"{snapshot.BeastPower} / {BeastmasterGaugeSnapshot.MaximumGauge}", "Beast Heart Skill Resource");
+            DrawGaugeRow("Current Whistle", snapshot.WhistleIndex is >= 1 and <= 3
+                ? $"No. {snapshot.WhistleIndex}"
+                : "Not Summoned", "Current Whistle Type");
+            DrawGaugeRow("Pet HP", snapshot.SummonMaxHp > 0
                 ? $"{snapshot.SummonHpPercent:0.#}%（{snapshot.SummonCurrentHp}/{snapshot.SummonMaxHp}）"
-                : "不可用", "自动最后一击依据");
-            DrawGaugeRow("御兽之心", $"{snapshot.BeastHeartStacks} 层", "协作量谱");
-            DrawGaugeRow("兽灵之心", $"{snapshot.BeastSoulStacks} 层", "协作量谱");
-            DrawGaugeRow("黑白状态", GetBlackWhiteStatus(snapshot), "生息 4599 / 死灭 4600");
+                : "Unavailable", "Auto Finishing Blow Basis");
+            DrawGaugeRow("Heart of Taming", $"{snapshot.BeastHeartStacks} stacks", "Link Gauge");
+            DrawGaugeRow("Heart of the Beast Spirit", $"{snapshot.BeastSoulStacks} stacks", "Link Gauge");
+            DrawGaugeRow("Black/White Status", GetBlackWhiteStatus(snapshot), "Vital 4599 / Void 4600");
             ImGui.EndTable();
         }
 
-        ImGui.TextDisabled($"当前决策：{GetGaugeDecision(snapshot)}");
-        ImGui.TextDisabled($"高级技能判断：{autoCaptureService.AdvancedActionStatus}");
+        ImGui.TextDisabled($"Current Decision: {GetGaugeDecision(snapshot)}");
+        ImGui.TextDisabled($"Advanced Skill Judgment: {autoCaptureService.AdvancedActionStatus}");
 
     }
 
@@ -3446,7 +3446,7 @@ public sealed class PluginUI
     {
         if (snapshot.SummonDataId == 0)
         {
-            ImGui.TextDisabled("当前魔兽：未召唤");
+            ImGui.TextDisabled("Current Beast: Not Summoned");
             return;
         }
 
@@ -3454,47 +3454,47 @@ public sealed class PluginUI
             item => item.Number == snapshot.SummonDataId - 18915);
         if (entry == null)
         {
-            ImGui.TextDisabled($"当前魔兽：{snapshot.SummonName}（DataId {snapshot.SummonDataId}）");
+            ImGui.TextDisabled($"Current Beast: {snapshot.SummonName} (DataId {snapshot.SummonDataId})");
             return;
         }
 
-        ImGui.Text("当前魔兽");
+        ImGui.Text("Current Beast");
         ImGui.SameLine();
         ImGui.Text(entry.Name);
         ImGui.SameLine();
         ImGui.TextColored(GetAttributeColor(entry.Attribute), $"[{entry.Attribute}]");
-        ImGui.TextDisabled($"大招：{GetActionName(entry.UltimateActionId)} | 释放：{GetActionName(entry.ReleaseActionId)}");
+        ImGui.TextDisabled($"Ultimate: {GetActionName(entry.UltimateActionId)} | Release: {GetActionName(entry.ReleaseActionId)}");
     }
 
     private static string GetGaugeDecision(BeastmasterGaugeSnapshot snapshot)
     {
         if (snapshot.SummonDataId == 0)
         {
-            return "等待召唤兽";
+            return "Waiting for Summon";
         }
 
         if (snapshot.Tp < BeastmasterGaugeSnapshot.ComboGaugeRequirement)
         {
-            return $"积累技力（{snapshot.Tp}/{BeastmasterGaugeSnapshot.MaximumGauge}）";
+            return $"Building Skill Power ({snapshot.Tp}/{BeastmasterGaugeSnapshot.MaximumGauge})";
         }
 
         if (snapshot.BeastPower < BeastmasterGaugeSnapshot.ComboGaugeRequirement)
         {
-            return $"积累兽力（{snapshot.BeastPower}/{BeastmasterGaugeSnapshot.MaximumGauge}）";
+            return $"Building Beast Power ({snapshot.BeastPower}/{BeastmasterGaugeSnapshot.MaximumGauge})";
         }
 
         return snapshot.BeastHeartStacks > 0
-            ? "技力与兽力已满足，可结合御兽之心安排协作技"
-            : "技力与兽力已满足，可执行连招";
+            ? "Skill Power and Beast Power are ready — you can plan Link skills around Heart of Taming"
+            : "Skill Power and Beast Power are ready — you can execute the combo";
     }
 
     private static string GetBlackWhiteStatus(BeastmasterGaugeSnapshot snapshot)
         => (snapshot.HasWhiteStatus, snapshot.HasPurpleStatus) switch
         {
-            (true, true) => "白（生息）与黑/紫（死灭）同时激活",
-            (true, false) => "白（生息）",
-            (false, true) => "黑/紫（死灭）",
-            _ => "未激活",
+            (true, true) => "White (Vital) and Black/Purple (Void) active at the same time",
+            (true, false) => "White (Vital)",
+            (false, true) => "Black/Purple (Void)",
+            _ => "Inactive",
         };
 
     private string GetThirdFormActionName(BeastmasterGaugeSnapshot snapshot)
@@ -3517,10 +3517,10 @@ public sealed class PluginUI
 
     private static string GetThirdFormReason(BeastmasterGaugeSnapshot snapshot)
         => snapshot.BeastHeartStacks >= 3 && (snapshot.HasWhiteStatus || snapshot.HasPurpleStatus)
-            ? $"{GetBlackWhiteStatus(snapshot)}，御兽之心 {snapshot.BeastHeartStacks} 层，可使用鼓劲"
+            ? $"{GetBlackWhiteStatus(snapshot)}, Heart of Taming at {snapshot.BeastHeartStacks} stacks — Rally is available"
             : snapshot.HasWhiteStatus || snapshot.HasPurpleStatus
-                ? $"{GetBlackWhiteStatus(snapshot)}，等待御兽之心 3 层（当前 {snapshot.BeastHeartStacks} 层）"
-                : "等待生息（白）或死灭（黑/紫）状态";
+                ? $"{GetBlackWhiteStatus(snapshot)}, waiting for Heart of Taming to reach 3 stacks (currently {snapshot.BeastHeartStacks})"
+                : "Waiting for Vital (White) or Void (Black/Purple) status";
 
     private static void DrawGaugeRow(string name, object value, string description)
     {
@@ -3535,36 +3535,36 @@ public sealed class PluginUI
 
     private static void DrawBeastmasterGaugeGuide()
     {
-        if (!ImGui.CollapsingHeader("量谱说明##BeastmasterGaugeGuide"))
+        if (!ImGui.CollapsingHeader("Gauge Guide##BeastmasterGaugeGuide"))
         {
             return;
         }
 
-        ImGui.TextDisabled("以下说明整理自驯兽师职业量谱和技能逻辑。量谱区只读显示当前状态，不会修改游戏数据。");
+        ImGui.TextDisabled("The notes below are compiled from the Beastmaster job gauge and skill logic. The gauge panel is read-only and never modifies game data.");
         ImGui.Separator();
 
-        DrawGuideTitle("技力 / 兽力");
-        ImGui.TextWrapped("学会兽心特性后，技能栏会显示驯兽师专用的技能量谱。连续成功时，技力会增加；技力越高，战技威力越高。");
-        ImGui.TextWrapped("技力和兽力是驯兽师职业量谱中的两种资源，当前上限均为 250。资源越高，越容易满足对应技能和协作技的使用要求。");
+        DrawGuideTitle("Skill Power / Beast Power");
+        ImGui.TextWrapped("Once you learn the Beast Heart trait, the hotbar will show the Beastmaster's dedicated skill gauge. Skill Power increases on consecutive successes; the higher it is, the stronger your weaponskills.");
+        ImGui.TextWrapped("Skill Power and Beast Power are the two resources in the Beastmaster job gauge, currently capped at 250 each. The higher they are, the easier it is to meet the requirements for the corresponding skills and Link skills.");
 
         ImGui.Spacing();
-        DrawGuideTitle("御兽之心");
-        ImGui.TextWrapped("学会兽心 II 特性后，画面会显示御兽之心的状态。驯兽师成功通过兽心技鼓舞发动兽心协作技后，会获得一档御兽之心。");
-        ImGui.TextWrapped("发动技能鼓劲可以消耗全部御兽之心，并提升驯兽师的技力。消耗的御兽之心档数越高，技力提升越高。");
+        DrawGuideTitle("Heart of Taming");
+        ImGui.TextWrapped("Once you learn the Beast Heart II trait, the screen will show the Heart of Taming status. You gain a stack of Heart of Taming whenever you successfully trigger a Beast Heart Link skill through inspiration.");
+        ImGui.TextWrapped("Using Rally consumes all stacks of Heart of Taming and increases the Beastmaster's Skill Power. The more stacks consumed, the greater the increase.");
 
         ImGui.Spacing();
-        DrawGuideTitle("协作量谱");
-        ImGui.TextWrapped("协作量谱显示当前兽心协作技的状态。兽心技共有翔、猛、坚、魔四种属性，每次发动兽心技时，都会点亮对应的属性圆格。");
-        ImGui.TextWrapped("当驯兽师或魔兽一方发动兽心技后，只要另一方在 7 秒内发动技能，即可触发兽心协作技的追击伤害。");
-        ImGui.TextWrapped("协作量谱下方显示的数字是协作次数。协作次数越多，兽心协作技的威力越高。");
+        DrawGuideTitle("Link Gauge");
+        ImGui.TextWrapped("The Link Gauge shows the current state of Beast Heart Link skills. There are four Beast Heart attributes — Flight, Ferocity, Fortitude, and Magic — and each time a Beast Heart skill is used, its corresponding attribute node lights up.");
+        ImGui.TextWrapped("Once either the Beastmaster or the beast uses a Beast Heart skill, if the other party uses a skill within 7 seconds, it triggers the Beast Heart Link skill's follow-up damage.");
+        ImGui.TextWrapped("The number shown below the Link Gauge is the Link count. The more links you build up, the stronger the Beast Heart Link skill becomes.");
 
         ImGui.Spacing();
-        DrawGuideTitle("生息 / 死灭");
-        ImGui.TextWrapped("参考“翔→猛→坚→魔→翔”的属性循环，按顺时针顺序触发兽心协作技，可以发动更强的生息或死灭协作技。");
-        ImGui.TextWrapped("触发兽心协作技二式后，驯兽师将获得生息或死灭的兽心技属性；该属性会点亮协作量谱的中心，并影响后续协作技。");
+        DrawGuideTitle("Vital / Void");
+        ImGui.TextWrapped("Following the attribute cycle "Flight → Ferocity → Fortitude → Magic → Flight" and triggering Beast Heart Link skills clockwise lets you unleash a stronger Vital or Void Link skill.");
+        ImGui.TextWrapped("After triggering the second-stage Beast Heart Link skill, the Beastmaster gains the Vital or Void Beast Heart attribute; this lights up the center of the Link Gauge and affects subsequent Link skills.");
 
         ImGui.Spacing();
-        ImGui.TextColored(new Vector4(1f, 0.9f, 0.25f, 1f), "职业量谱的完整说明可随时在技能菜单中查看。");
+        ImGui.TextColored(new Vector4(1f, 0.9f, 0.25f, 1f), "The full job gauge explanation can be viewed anytime in the skill menu.");
     }
 
     private static void DrawGuideTitle(string title)
@@ -3574,7 +3574,7 @@ public sealed class PluginUI
 
     private static void DrawDependency(string name, bool available, string purpose)
     {
-        ImGui.TextColored(available ? new Vector4(0.35f, 0.8f, 0.48f, 1f) : new Vector4(0.9f, 0.42f, 0.38f, 1f), available ? "可用" : "未加载");
+        ImGui.TextColored(available ? new Vector4(0.35f, 0.8f, 0.48f, 1f) : new Vector4(0.9f, 0.42f, 0.38f, 1f), available ? "Available" : "Not Loaded");
         ImGui.SameLine();
         ImGui.Text(name);
         ImGui.SameLine();
@@ -3673,57 +3673,57 @@ public sealed class PluginUI
     private void DrawDebug()
     {
         ImGui.Text("DEBUG");
-        ImGui.TextDisabled("选择资料类型后读取；读取结果会自动复制到剪贴板。");
+        ImGui.TextDisabled("Select a data type, then load it; the result is automatically copied to the clipboard.");
         ImGui.Separator();
 
-        ImGui.Text("技能状态");
+        ImGui.Text("Skill Status");
         ImGui.SetNextItemWidth(Math.Max(120f, ImGui.GetContentRegionAvail().X - 72f));
         ImGui.InputText("##DebugActionId", ref debugActionId, 10);
         ImGui.SameLine();
-        if (ImGui.Button("查询##DebugActionStatus"))
+        if (ImGui.Button("Query##DebugActionStatus"))
         {
             try
             {
                 SetDebugResult(uint.TryParse(debugActionId, out var actionId)
                     ? debugDataService.GetActionStatusDebug(actionId, debugUseAdjustedActionId)
-                    : "技能状态\n请输入有效的数字 ActionId。");
+                    : "Skill Status\nPlease enter a valid numeric ActionId.");
             }
             catch (Exception ex)
             {
-                SetDebugResult($"技能状态\n查询异常: {ex.Message}");
+                SetDebugResult($"Skill Status\nQuery error: {ex.Message}");
             }
         }
 
-        ImGui.Checkbox("使用 GetAdjustedActionId", ref debugUseAdjustedActionId);
+        ImGui.Checkbox("Use GetAdjustedActionId", ref debugUseAdjustedActionId);
         ImGui.Spacing();
 
-        ImGui.Text("关键词查询");
+        ImGui.Text("Keyword Search");
         ImGui.SetNextItemWidth(-1f);
         ImGui.InputText("##DebugQuery", ref debugQuery, 128);
 
         DrawDebugActionRow(
             "##DebugSearchType",
             ref debugSearchType,
-            "职业\0区域\0任务\0物品\0NPC\0怪物\0副本\0",
-            "查询##DebugSearch",
+            "Class/Job\0Zone\0Quest\0Item\0NPC\0Monster\0Duty\0",
+            "Query##DebugSearch",
             RunDebugSearch);
 
         ImGui.Spacing();
-        ImGui.Text("项目资料");
+        ImGui.Text("Project Data");
         DrawDebugActionRow(
             "##DebugProjectDataType",
             ref debugProjectDataType,
-            "驯养魔兽之人任务\0当前所有任务状态\0驯兽师任务链\0图鉴副本 ID\0自动捕获 ID\0魔兽属性映射\0魔兽图鉴客户端数据\0推荐装备物品 ID\0魔兽恢复药扫描\0内容道具容器扫描\0XBM界面扫描\0XBM道具结构\0奇弈道具列表\0魔兽等级经验结构\0斗兽结算等级经验\0魔兽编队结构\0驯兽师养成数据模块\0奇弈道具ExecuteSlot测试(会使用0号槽)\0奇弈道具UseAction测试(会使用0号槽)\0热键栏奇弈道具扫描\0执行真实奇弈热键栏槽(会使用道具)\0ExecuteSlotById测试(热键栏2,会使用道具)\0",
-            "读取##DebugProjectData",
+            "Beast Tamer Quest\0All Current Quest States\0Beastmaster Quest Chain\0Catalog Duty IDs\0Auto-Capture IDs\0Beast Attribute Mapping\0Beast Catalog Client Data\0Recommended Gear Item IDs\0Beast Recovery Item Scan\0Content Item Container Scan\0XBM UI Scan\0XBM Item Structure\0Trial Item List\0Beast Level EXP Structure\0Beast Arena Results Level EXP\0Beast Formation Structure\0Beastmaster Progression Data Module\0Trial Item ExecuteSlot Test (uses slot 0)\0Trial Item UseAction Test (uses slot 0)\0Hotbar Trial Item Scan\0Execute Real Trial Hotbar Slot (uses item)\0ExecuteSlotById Test (hotbar 2, uses item)\0",
+            "Load##DebugProjectData",
             RunDebugProjectData);
 
         ImGui.Spacing();
-        ImGui.Text("当前状态");
+        ImGui.Text("Current State");
         DrawDebugActionRow(
             "##DebugCurrentStateType",
             ref debugCurrentStateType,
-            "驯兽师量谱原始数据\0当前目标状态\0当前连击状态\0协力验证数据\0当前角色\0当前位置\0目标捕获判定\0自动输出状态\0技能序列验证数据\0",
-            "读取##DebugCurrentState",
+            "Raw Beastmaster Gauge Data\0Current Target State\0Current Combo State\0Link Validation Data\0Current Character\0Current Location\0Target Capture Judgment\0Auto Rotation State\0Skill Sequence Validation Data\0",
+            "Load##DebugCurrentState",
             RunDebugCurrentState);
 
         ImGui.Spacing();
@@ -3741,16 +3741,16 @@ public sealed class PluginUI
     private void DrawUseActionScanRow()
     {
         ImGui.SetNextItemWidth(Math.Max(120f, ImGui.GetContentRegionAvail().X - 72f));
-        ImGui.Text($"ActionId 扫描: {(debugDataService.IsUseActionScanActive ? "进行中..." : "空闲")}");
+        ImGui.Text($"ActionId Scan: {(debugDataService.IsUseActionScanActive ? "Running..." : "Idle")}");
         ImGui.SameLine();
-        if (ImGui.Button("扫描0号槽 ActionId 46959~46980##StartUseActionScan"))
+        if (ImGui.Button("Scan Slot 0 ActionId 46959-46980##StartUseActionScan"))
         {
             SetDebugResult(debugDataService.StartUseActionScan(0, 46959, 46980));
         }
 
         if (ImGui.Button(debugDataService.IsCaptureActive
-                ? "停止奇弈点击捕获##StopCapture"
-                : "开始奇弈点击捕获##StartCapture"))
+                ? "Stop Trial Click Capture##StopCapture"
+                : "Start Trial Click Capture##StartCapture"))
         {
             SetDebugResult(debugDataService.IsCaptureActive
                 ? debugDataService.StopCrucibleClickCapture()
@@ -3763,7 +3763,7 @@ public sealed class PluginUI
         debugDataService.UpdateUseActionScan();
         while (debugDataService.TryTakeUseActionScanLog(out var log))
         {
-            DalamudApi.ChatGui.Print($"[驯兽师恢复药诊断] {log}");
+            DalamudApi.ChatGui.Print($"[Beastmaster Recovery Item Diagnostics] {log}");
         }
     }
 
@@ -3794,7 +3794,7 @@ public sealed class PluginUI
             4 => debugDataService.FindNpcs(debugQuery),
             5 => debugDataService.FindMonsters(debugQuery),
             6 => debugDataService.FindDuties(debugQuery),
-            _ => "未知查询类型。",
+            _ => "Unknown query type.",
         });
     }
 
@@ -3802,7 +3802,7 @@ public sealed class PluginUI
     {
         SetDebugResult(debugProjectDataType switch
         {
-            0 => debugDataService.FindQuests("驯养魔兽之人"),
+            0 => debugDataService.FindQuests("Beast Tamer"),
             1 => questService.GetActiveQuestsDebug(),
             2 => debugDataService.FindBeastmasterQuestChain(),
             3 => debugDataService.FindCatalogDuties(),
@@ -3824,7 +3824,7 @@ public sealed class PluginUI
             19 => debugDataService.ScanHotbarsForCrucibleItems(),
             20 => debugDataService.TestExecuteRealCrucibleSlot(2, 0),
             21 => debugDataService.TestExecuteSlotById(2, 11),
-            _ => "未知项目资料类型。",
+            _ => "Unknown project data type.",
         });
     }
 
@@ -3841,7 +3841,7 @@ public sealed class PluginUI
             6 => debugDataService.GetCaptureCheckDebug(),
             7 => debugDataService.GetAutoOutputConditionDebug(),
             8 => debugDataService.GetSkillSequenceValidationDebug(),
-            _ => "未知当前状态类型。",
+            _ => "Unknown current state type.",
         });
     }
 
